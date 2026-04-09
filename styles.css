@@ -385,6 +385,269 @@ a:hover {
 }
 
 /* ---------------------------------------------------------------
+   The Margin — reading room landing
+   --------------------------------------------------------------- */
+
+.essay-section {
+  margin-bottom: 64px;
+}
+
+.essay-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.essay-list-item {
+  background: #fff;
+  border: 1px solid var(--paper-shadow);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.02),
+    0 6px 18px rgba(45, 58, 95, 0.04);
+  border-radius: 2px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.essay-list-item:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.03),
+    0 12px 28px rgba(45, 58, 95, 0.06);
+}
+
+.essay-link {
+  display: block;
+  padding: 22px 26px;
+  color: var(--ink);
+  border-bottom: none;
+}
+
+.essay-link:hover {
+  border-bottom: none;
+  color: var(--ink);
+}
+
+.essay-link-title {
+  font-size: 22px;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.essay-link:hover .essay-link-title {
+  color: var(--burgundy);
+}
+
+.essay-link-blurb {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------
+   The Margin — individual essay page
+   --------------------------------------------------------------- */
+
+.essay-body {
+  background: var(--paper);
+  background-image: none; /* no ruled paper inside the essay; it distracts from prose */
+}
+
+.essay-nav {
+  max-width: 680px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.essay-nav a {
+  color: var(--ink-ghost);
+  border-bottom: none;
+}
+
+.essay-nav a:hover {
+  color: var(--burgundy);
+}
+
+.essay {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 48px;
+}
+
+.essay-header {
+  text-align: center;
+  margin-bottom: 56px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.essay-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 44px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 0 0 14px;
+  letter-spacing: -0.005em;
+}
+
+.essay-subtitle {
+  font-family: var(--serif);
+  font-size: clamp(16px, 1.8vw, 18px);
+  color: var(--ink-mute);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.essay-subtitle em {
+  font-style: italic;
+}
+
+.essay-body-inner {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.72;
+  color: var(--ink);
+}
+
+.essay-body-inner p {
+  margin: 0 0 22px;
+}
+
+.essay-body-inner h2 {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 48px 0 18px;
+  line-height: 1.25;
+}
+
+.essay-body-inner h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 36px 0 14px;
+}
+
+.essay-body-inner em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+.essay-body-inner strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.essay-body-inner a {
+  color: var(--burgundy);
+  border-bottom: 1px solid rgba(107, 45, 45, 0.3);
+}
+
+.essay-body-inner a:hover {
+  border-bottom-color: var(--burgundy);
+}
+
+.essay-body-inner code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 1px 5px;
+  background: rgba(138, 148, 178, 0.12);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--ink);
+}
+
+.essay-body-inner pre {
+  background: #fff;
+  border: 1px solid var(--paper-shadow);
+  border-left: 3px solid var(--burgundy);
+  border-radius: 2px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.essay-body-inner pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.essay-body-inner blockquote {
+  margin: 24px 0;
+  padding: 4px 0 4px 24px;
+  border-left: 2px solid var(--rose);
+  font-style: italic;
+  color: var(--ink-mute);
+}
+
+.essay-body-inner blockquote p {
+  margin-bottom: 10px;
+}
+
+.essay-body-inner ul,
+.essay-body-inner ol {
+  margin: 0 0 22px;
+  padding-left: 26px;
+}
+
+.essay-body-inner li {
+  margin-bottom: 8px;
+}
+
+.essay-body-inner hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 48px auto;
+  max-width: 200px;
+}
+
+.essay-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+
+.essay-sign {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--ink-ghost);
+  margin: 0;
+}
+
+.colophon-slim {
+  padding-top: 24px;
+  padding-bottom: 48px;
+  border-top: none;
+}
+
+/* ---------------------------------------------------------------
    Responsive
    --------------------------------------------------------------- */
 
