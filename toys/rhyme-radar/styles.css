@@ -359,3 +359,125 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Mobile — ≤ 768px                                                    */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 768px) {
+  :root {
+    --gutter: 1rem;
+  }
+
+  html, body {
+    font-size: 16px;
+  }
+
+  .masthead {
+    padding: 1.25rem var(--gutter) 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Seed form: stack label + input vertically, let hint wrap below */
+  .seed-form {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0 1.25rem;
+  }
+
+  .seed-label {
+    /* Hide the "word" mono label on mobile — placeholder covers it */
+    display: none;
+  }
+
+  .seed-input {
+    font-size: 1.4rem;
+    min-width: 0;
+    width: min(100%, 20rem);
+    max-width: 100%;
+    /* Increase tap target height */
+    padding: 0.5rem 0.75rem;
+  }
+
+  .seed-hint {
+    min-width: 0;
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+    font-size: 0.7rem;
+  }
+
+  /* Legend: wrap to two rows on phones */
+  .legend {
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* Pull up slightly so it doesn't sit at the very edge */
+    bottom: 0.25rem;
+  }
+
+  /* Keyboard hint: hide on mobile — not relevant for touch users */
+  .kbd-hint > span {
+    display: none;
+  }
+
+  /* Audio toggle: make it a proper touch-friendly button */
+  .audio-toggle {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    min-height: 44px;
+    min-width: 80px;
+  }
+
+  .kbd-hint {
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .breadcrumb {
+    margin-top: 1rem;
+    padding: 1rem 0 0.5rem;
+  }
+
+  .colophon {
+    padding: 1rem var(--gutter);
+    font-size: 0.75rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Small phones — ≤ 480px                                              */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 480px) {
+  .title {
+    /* clamp already scales, but floor at 2rem on very small screens */
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Legend: smaller text and dots so it fits in a single row on wider
+     phones; wraps to two rows on the narrowest */
+  .legend {
+    font-size: 0.65rem;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .legend-item::before {
+    width: 0.55rem;
+    height: 0.55rem;
+  }
+
+  .seed-input {
+    font-size: 1.25rem;
+  }
+
+  /* Breadcrumb words shouldn't be too tiny */
+  .breadcrumb-list {
+    font-size: 0.95rem;
+  }
+}

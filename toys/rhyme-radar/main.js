@@ -257,7 +257,9 @@ function drawRingWords(words, radius, color, opacity, rand, ringIndex) {
     // Measure the text for hit detection
     const metrics = ctx.measureText(word);
     const w = metrics.width;
-    const h = 20;
+    // Generous hit height so touch taps land reliably — 36 canvas-px
+    // maps to ~15 screen-px on a 375-wide phone (900/375 = 2.4 scale).
+    const h = 36;
 
     // Check if this word is the currently hovered one. If so, render it
     // slightly larger and fully opaque (no fade during animation); the
@@ -282,17 +284,18 @@ function drawRingWords(words, radius, color, opacity, rand, ringIndex) {
       ctx.fillText(word, x, y);
     }
 
-    // Register hit target (only at full opacity — don't register during animation)
+    // Register hit target (only at full opacity — don't register during animation).
+    // Horizontal padding is 16px each side; vertical uses the full generous h.
     if (opacity > 0.95) {
       hitTargets.push({
         word,
         entry,
-        x: x - w / 2 - 4,
-        y: y - h / 2 - 2,
+        x: x - w / 2 - 16,
+        y: y - h / 2,
         cx: x,
         cy: y,
-        width: w + 8,
-        height: h + 4,
+        width: w + 32,
+        height: h,
         ring: ringIndex,
       });
     }
@@ -613,27 +616,46 @@ seedInput.addEventListener("input", () => {
   }, 250);
 });
 
-// Click anywhere on canvas — hit test against word rects
-canvas.addEventListener("click", (e) => {
+// Hit-test helper — shared by click and touchend handlers
+function hitTestCanvas(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
-  // Convert physical click coords to logical canvas coords
   const scale = CANVAS_SIZE / rect.width;
-  const x = (e.clientX - rect.left) * scale;
-  const y = (e.clientY - rect.top) * scale;
+  const x = (clientX - rect.left) * scale;
+  const y = (clientY - rect.top) * scale;
 
-  // Hit test in reverse (outer rings on top of inner ring guide lines)
   for (let i = hitTargets.length - 1; i >= 0; i--) {
     const t = hitTargets[i];
     if (
       x >= t.x && x <= t.x + t.width &&
       y >= t.y && y <= t.y + t.height
     ) {
-      setSeed(t.word);
-      seedInput.value = t.word;
-      return;
+      return t;
     }
   }
+  return null;
+}
+
+// Click anywhere on canvas — hit test against word rects
+canvas.addEventListener("click", (e) => {
+  const hit = hitTestCanvas(e.clientX, e.clientY);
+  if (hit) {
+    setSeed(hit.word);
+    seedInput.value = hit.word;
+  }
 });
+
+// Touch: fire immediately on touchend without waiting for the 300 ms
+// click delay. We only act on single-finger taps (no scroll, no zoom).
+canvas.addEventListener("touchend", (e) => {
+  if (e.changedTouches.length !== 1) return;
+  const touch = e.changedTouches[0];
+  const hit = hitTestCanvas(touch.clientX, touch.clientY);
+  if (hit) {
+    e.preventDefault(); // prevent the follow-up click event
+    setSeed(hit.word);
+    seedInput.value = hit.word;
+  }
+}, { passive: false });
 
 // Mouse-move hover: hit-test and redraw if the hovered word changed.
 // Throttled by rAF so we don't thrash the renderer.
