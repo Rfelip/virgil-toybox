@@ -385,6 +385,77 @@ a:hover {
 }
 
 /* ---------------------------------------------------------------
+   Two doors — top-of-cabinet entry points to toys and the margin
+   --------------------------------------------------------------- */
+
+.two-doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 720px;
+  margin: 0 auto 80px;
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 32px 36px;
+  background: #fff;
+  border: 1px solid var(--paper-shadow);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.03),
+    0 10px 28px rgba(45, 58, 95, 0.06);
+  border-radius: 2px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--paper-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: left;
+}
+
+.door:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.04),
+    0 18px 40px rgba(45, 58, 95, 0.09);
+  border-bottom-color: var(--paper-shadow);
+  color: var(--ink);
+}
+
+.door-title {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3vw, 32px);
+  font-style: italic;
+  font-weight: 500;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.door-sub {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-mute);
+  margin: 0 0 8px;
+}
+
+.door-cta {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--burgundy);
+  margin-top: 4px;
+}
+
+.door:hover .door-cta {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------
    The Margin — reading room landing
    --------------------------------------------------------------- */
 
@@ -654,6 +725,16 @@ a:hover {
 @media (max-width: 720px) {
   .masthead {
     padding: 72px 20px 36px;
+  }
+
+  .two-doors {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 56px;
+  }
+
+  .door {
+    padding: 24px 28px;
   }
 
   .featured-card {

@@ -34,15 +34,29 @@
     <!-- About — one paragraph, no insider details -->
     <section class="about" aria-label="About">
       <p>
-        A place for interactive experiments made in the quiet hours.
-        Each toy is its own small world &mdash; open one, wander, come
-        back. The aesthetic is letterpress on purpose: paper, ink,
-        serifs, the feeling of a little book you can click on.
+        A small place with two rooms. One has interactive toys you can
+        play with; the other is a reading room for essays. Both share
+        the same letterpress aesthetic &mdash; paper, ink, serifs, the
+        feeling of a little book you can click on. Pick a door.
       </p>
     </section>
 
+    <!-- Two doors — equal-weight entry points to the two rooms -->
+    <section class="two-doors" aria-label="Two rooms">
+      <a class="door" href="#toys">
+        <h2 class="door-title">the toys</h2>
+        <p class="door-sub">interactive things to play with</p>
+        <span class="door-cta">enter&nbsp;&rsaquo;</span>
+      </a>
+      <a class="door" href="the-margin/">
+        <h2 class="door-title">the margin</h2>
+        <p class="door-sub">essays in the quiet hours</p>
+        <span class="door-cta">enter&nbsp;&rsaquo;</span>
+      </a>
+    </section>
+
     <!-- Featured toy — large card, full-width, hero position -->
-    <section class="featured" aria-label="Featured toy">
+    <section class="featured" id="toys" aria-label="Featured toy">
       <div class="section-label">
         <span class="label-bar"></span>
         <span class="label-text">featured</span>
@@ -144,52 +158,6 @@
 
         <!-- When new toys ship they drop in here as more .toy-card anchors -->
 
-      </div>
-    </section>
-
-    <!-- Reading room — a second door for read-shaped visitors -->
-    <section class="toy-list" aria-label="For readers">
-      <div class="section-label">
-        <span class="label-bar"></span>
-        <span class="label-text">for readers</span>
-        <span class="label-bar"></span>
-      </div>
-
-      <div class="card-grid">
-        <a class="toy-card" href="the-margin/">
-          <div class="toy-card-art" aria-hidden="true">
-            <!-- A stylized open book with a bookmark in the margin -->
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <!-- Page -->
-              <rect x="20" y="18" width="60" height="64" fill="#f5efe0" stroke="#2d3a5f" stroke-width="0.8" />
-              <!-- Ruled lines -->
-              <line x1="30" y1="30" x2="70" y2="30" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="36" x2="70" y2="36" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="42" x2="70" y2="42" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="48" x2="65" y2="48" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="54" x2="70" y2="54" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="60" x2="58" y2="60" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="66" x2="70" y2="66" stroke="#8a94b2" stroke-width="0.3" />
-              <line x1="30" y1="72" x2="52" y2="72" stroke="#8a94b2" stroke-width="0.3" />
-              <!-- Margin line -->
-              <line x1="28" y1="18" x2="28" y2="82" stroke="#a07a7a" stroke-width="0.4" />
-              <!-- A handwritten asterisk in the margin -->
-              <text x="24" y="42" font-family="'EB Garamond', serif" font-size="10" font-style="italic" fill="#6b2d2d">*</text>
-              <!-- A small pilcrow mark -->
-              <text x="24" y="58" font-family="'EB Garamond', serif" font-size="8" font-style="italic" fill="#6b2d2d">¶</text>
-            </svg>
-          </div>
-          <div class="toy-card-body">
-            <h3 class="card-title">The Margin</h3>
-            <p class="card-sub">a reading room</p>
-            <p class="card-blurb">
-              Essays written in the quiet hours. On craft, notation,
-              literature, the shape of thinking. One new piece when one
-              is finished &mdash; slow pace, small room, no schedule.
-            </p>
-            <span class="card-cta">enter&nbsp;&rsaquo;</span>
-          </div>
-        </a>
       </div>
     </section>
 
