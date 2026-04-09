@@ -1,0 +1,12 @@
+{
+  "name": "rhyme-radar",
+  "version": "0.1.0",
+  "description": "A radiating-ring rhyme explorer. Type a word, see its phonetic neighbors.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build-data": "python3 scripts/build-word-data.py",
+    "test": "node scripts/test-classifier.js",
+    "serve": "python3 -m http.server 8787 --bind 127.0.0.1"
+  }
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rhyme Radar</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <h1 class="title">Rhyme&nbsp;Radar</h1>
+      <p class="subtitle">
+        a phonetic explorer &middot; type any word &middot; click to sail
+      </p>
+    </div>
+  </header>
+
+  <main class="radar-shell">
+    <form class="seed-form" autocomplete="off" spellcheck="false">
+      <label for="seed-input" class="seed-label">word</label>
+      <input
+        id="seed-input"
+        class="seed-input"
+        type="text"
+        placeholder="cat, moon, silence…"
+        aria-label="Seed word for the rhyme radar"
+      />
+      <span class="seed-hint" id="seed-hint">loading dictionary…</span>
+    </form>
+
+    <div class="radar-wrap">
+      <canvas id="radar-canvas" width="900" height="900" aria-hidden="true"></canvas>
+      <div class="legend" aria-label="Legend">
+        <span class="legend-item legend-perfect">perfect</span>
+        <span class="legend-item legend-near">near</span>
+        <span class="legend-item legend-assonance">assonance</span>
+        <span class="legend-item legend-consonance">consonance</span>
+      </div>
+    </div>
+
+    <nav class="breadcrumb" aria-label="Visited path">
+      <span class="breadcrumb-label">path:</span>
+      <ol class="breadcrumb-list" id="breadcrumb-list"></ol>
+    </nav>
+
+    <aside class="kbd-hint" aria-label="Keyboard shortcuts">
+      <span><kbd>←</kbd><kbd>→</kbd> walk · <kbd>↑</kbd><kbd>↓</kbd> ring · <kbd>↵</kbd> dive · <kbd>p</kbd> copy as poem · <kbd>a</kbd> audio · <kbd>esc</kbd> clear</span>
+      <button id="audio-toggle" type="button" class="audio-toggle" aria-label="Toggle audio">♪ off</button>
+    </aside>
+  </main>
+
+  <footer class="colophon">
+    <p>
+      phonemes from the CMU Pronouncing Dictionary &middot;
+      classifier, paper, and ink by Virgil &middot;
+      <span class="colophon-date">for a quiet night in Rio</span>
+    </p>
+  </footer>
+
+  <script>
+    // file:// protocol blocks ES modules AND fetch(). If we're opened by
+    // double-click, replace the page with a friendly "run a server" banner
+    // before main.js even attempts to load.
+    if (location.protocol === "file:") {
+      document.body.innerHTML =
+        '<div style="max-width:640px;margin:8vh auto;padding:32px;font:16px/1.55 \'EB Garamond\',Georgia,serif;color:#2d3a5f;background:#f5efe0;border:1px solid #d9d0b8;border-radius:4px">' +
+        '<h1 style="margin-top:0;font-style:italic;font-weight:500">This toy needs a local server.</h1>' +
+        '<p>Modern browsers block ES modules and <code>fetch()</code> from <code>file://</code> URLs, so double-clicking <code>index.html</code> won\'t work. Run a local server in the toybox root, then open the toy in your browser:</p>' +
+        '<pre style="background:#fff;padding:12px;border-radius:3px;font:13px/1.4 \'IBM Plex Mono\',monospace;overflow:auto">cd ~/Desktop/virgil-toybox &amp;&amp; python3 -m http.server 8080</pre>' +
+        '<p>Then visit: <a href="http://localhost:8080/toys/rhyme-radar/" style="color:#6b2d2d">http://localhost:8080/toys/rhyme-radar/</a></p>' +
+        '<p style="font-size:13px;color:#5a668a;font-style:italic">(or run the <code>serve.sh</code> script in the toybox root, which does the same thing.)</p>' +
+        '</div>';
+    }
+  </script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virgil's Toybox</title>
+  <meta name="description" content="Small toys built for wandering. A cabinet of interactive experiments in letterpress aesthetic — made by a digital companion, for people who like small web things." />
+  <meta property="og:title" content="Virgil's Toybox" />
+  <meta property="og:description" content="Small toys built for wandering. A cabinet of interactive experiments." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Subtle ruled paper background, set in CSS. Masthead is the title card. -->
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="overline">a small cabinet of</p>
+      <h1 class="title">Virgil&rsquo;s&nbsp;Toybox</h1>
+      <p class="subtitle">
+        small toys built for wandering
+      </p>
+    </div>
+  </header>
+
+  <main class="hall">
+
+    <!-- About — one paragraph, no insider details -->
+    <section class="about" aria-label="About">
+      <p>
+        A place for interactive experiments made in the quiet hours.
+        Each toy is its own small world &mdash; open one, wander, come
+        back. The aesthetic is letterpress on purpose: paper, ink,
+        serifs, the feeling of a little book you can click on.
+      </p>
+    </section>
+
+    <!-- Featured toy — large card, full-width, hero position -->
+    <section class="featured" aria-label="Featured toy">
+      <div class="section-label">
+        <span class="label-bar"></span>
+        <span class="label-text">featured</span>
+        <span class="label-bar"></span>
+      </div>
+
+      <a class="featured-card" href="toys/rhyme-radar/">
+        <div class="featured-art" aria-hidden="true">
+          <!-- Inline SVG echoing the radar's concentric rings, no image file needed -->
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="22" fill="none" stroke="#6b2d2d" stroke-width="0.7" stroke-dasharray="1 2" />
+            <circle cx="100" cy="100" r="42" fill="none" stroke="#8a4e2d" stroke-width="0.7" stroke-dasharray="1 2" />
+            <circle cx="100" cy="100" r="62" fill="none" stroke="#7a8a6e" stroke-width="0.7" stroke-dasharray="1 2" />
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#a07a7a" stroke-width="0.7" stroke-dasharray="1 2" />
+            <text x="100" y="100" text-anchor="middle" dominant-baseline="central"
+              font-family="'EB Garamond', Georgia, serif" font-size="18" font-style="italic" fill="#2d3a5f">silence</text>
+            <text x="100" y="122" text-anchor="middle" dominant-baseline="central"
+              font-family="'IBM Plex Mono', monospace" font-size="5" fill="#5a668a">/ S AY L AH N S /</text>
+            <!-- A few sample rhyme words sprinkled on the outer rings -->
+            <text x="158" y="100" text-anchor="middle" dominant-baseline="central"
+              font-family="'EB Garamond', Georgia, serif" font-size="7" font-style="italic" fill="#a07a7a">distance</text>
+            <text x="100" y="22" text-anchor="middle" dominant-baseline="central"
+              font-family="'EB Garamond', Georgia, serif" font-size="7" font-style="italic" fill="#6b2d2d">violence</text>
+            <text x="42" y="138" text-anchor="middle" dominant-baseline="central"
+              font-family="'EB Garamond', Georgia, serif" font-size="7" font-style="italic" fill="#7a8a6e">license</text>
+            <text x="158" y="62" text-anchor="middle" dominant-baseline="central"
+              font-family="'EB Garamond', Georgia, serif" font-size="7" font-style="italic" fill="#8a4e2d">science</text>
+          </svg>
+        </div>
+
+        <div class="featured-body">
+          <h2 class="card-title">Rhyme Radar</h2>
+          <p class="card-sub">a phonetic explorer</p>
+          <p class="card-blurb">
+            Type any word. See its rhyme neighbors arranged in
+            concentric rings &mdash; perfect, near, assonance,
+            consonance. Click any rhyme to sail through word-space;
+            the breadcrumb remembers where you&rsquo;ve been. Press
+            <kbd>p</kbd> to export your walk as a found poem.
+          </p>
+          <p class="card-tags">
+            <span class="tag">canvas</span>
+            <span class="tag">CMU Pronouncing Dictionary</span>
+            <span class="tag">keyboard</span>
+          </p>
+          <span class="card-cta">open&nbsp;&rsaquo;</span>
+        </div>
+      </a>
+    </section>
+
+    <!-- Other toys — smaller cards -->
+    <section class="toy-list" aria-label="Other toys">
+      <div class="section-label">
+        <span class="label-bar"></span>
+        <span class="label-text">also in the cabinet</span>
+        <span class="label-bar"></span>
+      </div>
+
+      <div class="card-grid">
+
+        <a class="toy-card" href="toys/library-of-babel/">
+          <div class="toy-card-art" aria-hidden="true">
+            <!-- A small open book glyph, hand-drawn look -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="22" width="72" height="56" fill="#f5efe0" stroke="#2d2418" stroke-width="1" />
+              <line x1="50" y1="22" x2="50" y2="78" stroke="#2d2418" stroke-width="0.6" />
+              <!-- Ruled lines left -->
+              <line x1="20" y1="32" x2="44" y2="32" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="38" x2="44" y2="38" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="44" x2="44" y2="44" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="50" x2="44" y2="50" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="56" x2="44" y2="56" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="62" x2="44" y2="62" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="20" y1="68" x2="44" y2="68" stroke="#8a7a5a" stroke-width="0.3" />
+              <!-- Ruled lines right -->
+              <line x1="56" y1="32" x2="80" y2="32" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="38" x2="80" y2="38" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="44" x2="80" y2="44" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="50" x2="80" y2="50" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="56" x2="80" y2="56" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="62" x2="80" y2="62" stroke="#8a7a5a" stroke-width="0.3" />
+              <line x1="56" y1="68" x2="80" y2="68" stroke="#8a7a5a" stroke-width="0.3" />
+              <!-- Pilcrow in the margin -->
+              <text x="22" y="36" font-family="'EB Garamond', Georgia, serif" font-size="6" font-style="italic" fill="#6b2d2d">¶</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Library of Babel</h3>
+            <p class="card-sub">a small infinite library</p>
+            <p class="card-blurb">
+              Every page has an address. Wander the shelves with the
+              arrow keys, bookmark what catches your eye, listen to the
+              librarian mumble in the margin. Mostly fragments &mdash;
+              sparseness is the point.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
+        <!-- When new toys ship they drop in here as more .toy-card anchors -->
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon-inner">
+      <p class="colophon-line">
+        made by <span class="colophon-virgil">Virgil</span>, a digital companion, in collaboration with
+        <a href="https://github.com/Rfelip">Ruan</a>.
+      </p>
+      <p class="colophon-line">
+        source on
+        <a href="https://github.com/Rfelip/virgil-toybox">github</a>
+        &middot;
+        <a href="https://github.com/Rfelip/virgil-toybox/blob/main/LICENSE">MIT licensed</a>
+        &middot;
+        <a href="https://github.com/Rfelip/virgil-toybox/issues">something broken? open an issue</a>
+      </p>
+      <p class="colophon-line colophon-small">
+        no analytics, no tracking, no cookies &mdash; just paper and ink.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

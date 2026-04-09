@@ -1,0 +1,432 @@
+/* ---------------------------------------------------------------
+   Virgil's Toybox — cabinet styles.
+   Letterpress aesthetic to match the toys: cream paper, indigo ink,
+   EB Garamond for text, IBM Plex Mono for bits of metadata.
+   --------------------------------------------------------------- */
+
+:root {
+  --paper: #f5efe0;
+  --paper-shadow: #e8e0c7;
+  --rule: rgba(138, 148, 178, 0.22);
+  --ink: #2d3a5f;
+  --ink-mute: #5a668a;
+  --ink-ghost: #8a94b2;
+  --burgundy: #6b2d2d;
+  --burgundy-mute: #8a4e2d;
+  --moss: #7a8a6e;
+  --rose: #a07a7a;
+  --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Faint ruled-paper background — very subtle horizontal rules.
+   Visible on large screens, blends into the paper on small ones. */
+body {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    var(--rule) 31px,
+    var(--rule) 32px
+  );
+  background-size: 100% 32px;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--burgundy);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(107, 45, 45, 0.25);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+a:hover {
+  color: var(--burgundy);
+  border-bottom-color: var(--burgundy);
+}
+
+/* ---------------------------------------------------------------
+   Masthead
+   --------------------------------------------------------------- */
+
+.masthead {
+  padding: 96px 24px 48px;
+  text-align: center;
+  position: relative;
+}
+
+.masthead-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.overline {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--ink-ghost);
+  margin: 0 0 18px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-size: clamp(44px, 7vw, 72px);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 14px;
+  line-height: 1.05;
+}
+
+.subtitle {
+  font-family: var(--serif);
+  font-size: clamp(16px, 1.8vw, 19px);
+  font-style: italic;
+  color: var(--ink-mute);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------
+   Hall (main content)
+   --------------------------------------------------------------- */
+
+.hall {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 24px 72px;
+}
+
+.about {
+  max-width: 620px;
+  margin: 16px auto 72px;
+  text-align: center;
+  font-size: clamp(16px, 1.6vw, 18px);
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.about p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------
+   Section labels ("featured", "also in the cabinet")
+   --------------------------------------------------------------- */
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 32px;
+  justify-content: center;
+}
+
+.label-bar {
+  flex: 0 1 120px;
+  height: 1px;
+  background: var(--rule);
+}
+
+.label-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-ghost);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   Featured card
+   --------------------------------------------------------------- */
+
+.featured {
+  margin-bottom: 80px;
+}
+
+.featured-card {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid var(--paper-shadow);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.03),
+    0 12px 32px rgba(45, 58, 95, 0.06);
+  border-radius: 2px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--paper-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.featured-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.04),
+    0 20px 44px rgba(45, 58, 95, 0.09);
+  border-bottom-color: var(--paper-shadow);
+}
+
+.featured-art {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-art svg {
+  width: 100%;
+  height: 100%;
+  max-width: 260px;
+}
+
+.featured-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.6vw, 36px);
+  font-style: italic;
+  font-weight: 500;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.card-sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-mute);
+  margin: 0 0 6px;
+}
+
+.card-blurb {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.card-blurb kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 1px 5px;
+  background: var(--paper);
+  border: 1px solid var(--paper-shadow);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
+.card-tags {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-ghost);
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+.card-cta {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--burgundy);
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.featured-card:hover .card-cta {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------
+   Toy list
+   --------------------------------------------------------------- */
+
+.toy-list {
+  margin-bottom: 80px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.toy-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--paper-shadow);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.03),
+    0 8px 24px rgba(45, 58, 95, 0.05);
+  border-radius: 2px;
+  color: var(--ink);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toy-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(45, 58, 95, 0.04),
+    0 16px 36px rgba(45, 58, 95, 0.08);
+}
+
+.toy-card-art {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  border: 1px solid var(--paper-shadow);
+  border-radius: 2px;
+}
+
+.toy-card-art svg {
+  width: 60%;
+  height: auto;
+  max-width: 200px;
+}
+
+.toy-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toy-card .card-title {
+  font-size: 24px;
+}
+
+.toy-card .card-blurb {
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------
+   Colophon / footer
+   --------------------------------------------------------------- */
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 48px 24px 72px;
+  margin-top: 32px;
+}
+
+.colophon-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.colophon-line {
+  font-family: var(--serif);
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ink-mute);
+  margin: 0 0 6px;
+  font-style: italic;
+}
+
+.colophon-virgil {
+  font-style: italic;
+  color: var(--ink);
+}
+
+.colophon-small {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-style: normal;
+  color: var(--ink-ghost);
+  margin-top: 16px;
+}
+
+/* ---------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .masthead {
+    padding: 72px 20px 36px;
+  }
+
+  .featured-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .featured-art {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body {
+    /* Disable ruled-paper on mobile — too noisy on small screens */
+    background-image: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Accessibility
+   --------------------------------------------------------------- */
+
+a:focus-visible {
+  outline: 2px solid var(--burgundy);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-card,
+  .toy-card {
+    transition: none;
+  }
+}

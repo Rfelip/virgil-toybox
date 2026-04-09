@@ -1,0 +1,432 @@
+/*
+  Library of Babel — cream night palette.
+  Sister to Rhyme Radar but dimmer; the library is open at night.
+*/
+
+:root {
+  /* Paper, dimmed for night reading */
+  --paper:        #ece2cf;
+  --paper-deep:   #e0d4bd;
+  --paper-edge:   #c8b896;
+
+  /* Inks */
+  --ink:          #2a241c;            /* body text */
+  --ink-soft:     #5a4d3c;            /* secondary */
+  --ink-faded:    #8a7c66;            /* hints */
+  --ink-indigo:   #2c3258;            /* accent — deep faded indigo */
+  --ink-sepia:    #7a4a2a;            /* librarian's voice */
+
+  /* Lamp glow + ambient */
+  --lamp-warm:    rgba(255, 200, 120, 0.18);
+  --lamp-edge:    rgba(20, 14, 6, 0.35);
+
+  /* Type */
+  --serif:        'EB Garamond', 'Garamond', 'Iowan Old Style', Georgia, serif;
+  --mono:         'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.55;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Lamp vignette: warm pool top-center, dim edges. */
+#lamp-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 70% 55% at 50% 18%,
+      var(--lamp-warm) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 120% 100% at 50% 50%,
+      transparent 50%,
+      var(--lamp-edge) 100%
+    );
+}
+
+/* === Address bar === */
+
+#address-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  align-items: baseline;
+  padding: 1.4rem 2rem 1rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+
+.address-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-faded);
+  white-space: nowrap;
+}
+
+#address-form { flex: 1 1 22rem; }
+
+#address-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--paper-edge);
+  color: var(--ink-indigo);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.1rem;
+  outline: none;
+}
+
+#address-input:focus {
+  border-bottom-color: var(--ink-indigo);
+}
+
+#room-tabs {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-faded);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-bottom: 1px solid transparent;
+}
+
+.tab:hover { color: var(--ink-soft); }
+
+.tab-active {
+  color: var(--ink);
+  border-bottom-color: var(--ink-indigo);
+}
+
+/* === Main / rooms === */
+
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 6rem;
+}
+
+.room { display: none; }
+.room-active { display: block; }
+
+/* === Reading room === */
+
+#page {
+  position: relative;
+  transition: opacity 240ms ease-out;
+}
+
+#page.turning {
+  opacity: 0;
+  transition: opacity 120ms ease-in;
+}
+
+#page-header {
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--paper-edge);
+  padding-bottom: 1rem;
+}
+
+#page-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.9rem;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+#page-subtitle {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin-top: 0.35rem;
+}
+
+#page-body {
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+#page-body p {
+  margin-bottom: 1.1rem;
+  text-indent: 1.4em;
+}
+
+#page-body p.lede {
+  text-indent: 0;
+  font-size: 1.18rem;
+}
+#page-body p.lede::first-letter {
+  font-family: var(--serif);
+  font-size: 2.7rem;
+  float: left;
+  line-height: 0.85;
+  padding-right: 0.18em;
+  padding-top: 0.18em;
+  color: var(--ink-indigo);
+}
+
+#page-body p.coda {
+  text-indent: 0;
+  text-align: center;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-top: 1.6rem;
+}
+
+#page-footer {
+  margin-top: 2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--paper-edge);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-faded);
+}
+
+#bookmark-btn {
+  background: transparent;
+  border: 1px solid var(--paper-edge);
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms;
+}
+
+#bookmark-btn:hover {
+  border-color: var(--ink-indigo);
+  color: var(--ink-indigo);
+}
+
+#bookmark-btn.pinned {
+  border-color: var(--ink-sepia);
+  color: var(--ink-sepia);
+}
+
+/* === Librarian === */
+
+#librarian {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.6rem;
+  max-width: 18rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-sepia);
+  line-height: 1.4;
+  text-align: right;
+  opacity: 0;
+  transform: translateY(0.4rem);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#librarian.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hide the librarian when the corkboard is showing — she's a reading-room presence. */
+body:not(.reading-room-active) #librarian {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+#librarian-mark {
+  display: inline-block;
+  margin-right: 0.3em;
+  font-style: normal;
+  color: var(--ink-faded);
+}
+
+/* === Corkboard === */
+
+#corkboard {
+  /* will style next pass */
+}
+
+.corkboard-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--paper-edge);
+  padding-bottom: 0.6rem;
+}
+
+.corkboard-empty {
+  color: var(--ink-faded);
+  font-style: italic;
+}
+
+#corkboard-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#corkboard-list li {
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-edge);
+  border-radius: 2px;
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  box-shadow: 1px 2px 0 rgba(40, 30, 15, 0.08);
+  transform: rotate(-0.4deg);
+  transition: transform 120ms;
+}
+#corkboard-list li:nth-child(2n) { transform: rotate(0.5deg); }
+#corkboard-list li:nth-child(3n) { transform: rotate(-0.2deg); }
+#corkboard-list li:hover { transform: rotate(0deg) translateY(-1px); }
+
+#corkboard-list .card-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+#corkboard-list .card-coord {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faded);
+}
+
+#corkboard-list .card-remove {
+  float: right;
+  background: transparent;
+  border: none;
+  color: var(--ink-faded);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+}
+#corkboard-list .card-remove:hover { color: var(--ink-sepia); }
+
+/* === Help dialog === */
+
+#help-toggle {
+  position: fixed;
+  bottom: 1.2rem;
+  left: 1.6rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--paper-edge);
+  background: var(--paper);
+  color: var(--ink-faded);
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 4;
+}
+#help-toggle:hover { color: var(--ink-indigo); border-color: var(--ink-indigo); }
+
+#help {
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  border-radius: 4px;
+  padding: 1.4rem 1.8rem;
+  max-width: 22rem;
+  color: var(--ink);
+  font-family: var(--serif);
+  box-shadow: 0 8px 30px rgba(20, 14, 6, 0.22);
+}
+#help::backdrop { background: rgba(20, 14, 6, 0.3); }
+
+#help h2 {
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: var(--ink);
+}
+
+#help dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+#help dt {
+  font-family: var(--mono);
+  color: var(--ink-faded);
+  white-space: nowrap;
+}
+#help kbd {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-edge);
+  border-radius: 2px;
+  padding: 0 0.3em;
+  color: var(--ink);
+}
+
+#help-close {
+  display: block;
+  margin: 1.2rem auto 0;
+  background: transparent;
+  border: 1px solid var(--paper-edge);
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  padding: 0.3rem 1rem;
+  border-radius: 2px;
+  cursor: pointer;
+}
+#help-close:hover { border-color: var(--ink-indigo); color: var(--ink-indigo); }
+
+/* === Misc === */
+
+::selection { background: rgba(44, 50, 88, 0.18); }
+
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  main { padding: 1.6rem 1.2rem 6rem; }
+  #librarian { max-width: 12rem; font-size: 0.85rem; }
+}

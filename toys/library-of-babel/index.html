@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library of Babel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="reading-room-active">
+
+<div id="lamp-vignette" aria-hidden="true"></div>
+
+<header id="address-bar">
+  <span class="address-label">you are at</span>
+  <form id="address-form">
+    <input
+      id="address-input"
+      type="text"
+      autocomplete="off"
+      spellcheck="false"
+      value="wing-I / shelf-1 / volume-I / page-1"
+      aria-label="library coordinate"
+    >
+  </form>
+  <nav id="room-tabs">
+    <button id="tab-reading" class="tab tab-active" type="button" aria-label="reading room">reading room</button>
+    <button id="tab-corkboard" class="tab" type="button" aria-label="corkboard">corkboard</button>
+  </nav>
+</header>
+
+<main>
+
+  <section id="reading-room" class="room room-active">
+
+    <article id="page">
+      <header id="page-header">
+        <h1 id="page-title"></h1>
+        <p id="page-subtitle"></p>
+      </header>
+      <div id="page-body"></div>
+      <footer id="page-footer">
+        <span id="page-coord"></span>
+        <button id="bookmark-btn" type="button" title="bookmark this page (b)">bookmark</button>
+      </footer>
+    </article>
+
+    <aside id="librarian" aria-live="polite">
+      <span id="librarian-mark">¶</span>
+      <span id="librarian-text"></span>
+    </aside>
+
+  </section>
+
+  <section id="corkboard" class="room" aria-hidden="true">
+    <h2 class="corkboard-title">corkboard</h2>
+    <p class="corkboard-empty" id="corkboard-empty">No bookmarks yet. Press <kbd>b</kbd> in the reading room to pin a page here.</p>
+    <ul id="corkboard-list"></ul>
+  </section>
+
+</main>
+
+<dialog id="help">
+  <h2>How to wander</h2>
+  <dl>
+    <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>previous / next page in the volume</dd>
+    <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>previous / next volume on the shelf</dd>
+    <dt><kbd>shift</kbd>+<kbd>←</kbd>/<kbd>→</kbd></dt><dd>previous / next shelf</dd>
+    <dt><kbd>shift</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd></dt><dd>previous / next wing</dd>
+    <dt><kbd>r</kbd></dt><dd>random teleport</dd>
+    <dt><kbd>b</kbd></dt><dd>bookmark this page</dd>
+    <dt><kbd>tab</kbd></dt><dd>reading room ↔ corkboard</dd>
+    <dt><kbd>?</kbd></dt><dd>show / hide this card</dd>
+  </dl>
+  <button id="help-close" type="button">close</button>
+</dialog>
+
+<button id="help-toggle" type="button" title="help (?)">?</button>
+
+<script>
+  // file:// protocol blocks ES modules. If we're opened by double-click,
+  // replace the page with a "run a local server" banner.
+  if (location.protocol === "file:") {
+    document.body.innerHTML =
+      '<div style="max-width:640px;margin:8vh auto;padding:32px;font:16px/1.55 \'EB Garamond\',Georgia,serif;color:#2d2418;background:#f5efe0;border:1px solid #d9d0b8;border-radius:4px">' +
+      '<h1 style="margin-top:0;font-style:italic;font-weight:500">This toy needs a local server.</h1>' +
+      '<p>Modern browsers block ES modules from <code>file://</code> URLs, so double-clicking <code>index.html</code> won\'t work. Run a local server in the toybox root, then open the toy in your browser:</p>' +
+      '<pre style="background:#fff;padding:12px;border-radius:3px;font:13px/1.4 \'IBM Plex Mono\',monospace;overflow:auto">cd ~/Desktop/virgil-toybox &amp;&amp; python3 -m http.server 8080</pre>' +
+      '<p>Then visit: <a href="http://localhost:8080/toys/library-of-babel/" style="color:#6b2d2d">http://localhost:8080/toys/library-of-babel/</a></p>' +
+      '<p style="font-size:13px;color:#5a668a;font-style:italic">(or run the <code>serve.sh</code> script in the toybox root, which does the same thing.)</p>' +
+      '</div>';
+  }
+</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
