@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound of Sorting — The Night Gazette</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper: #f6efe1;
+    --paper-shadow: #ebe2cf;
+    --ink: #2a2419;
+    --ink-soft: #5a4f3e;
+    --accent-amber: #c89a3a;
+    --accent-red: #b8462e;
+    --accent-green: #5e7c3c;
+    --rule: rgba(42, 36, 25, 0.18);
+  }
+
+  html, body {
+    width: 100%; min-height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  }
+
+  body {
+    padding: 32px 40px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background:
+      radial-gradient(circle at 25% 15%, rgba(255,255,255,0.5), transparent 60%),
+      radial-gradient(circle at 80% 80%, rgba(0,0,0,0.04), transparent 50%),
+      var(--paper);
+  }
+
+  header {
+    border-bottom: 2px double var(--rule);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-top: 6px;
+  }
+
+  .masthead {
+    text-align: right;
+    font-family: 'IBM Plex Mono', 'Menlo', 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .masthead em {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ─── Canvas ─── */
+  .stage {
+    position: relative;
+    background: #fbf6e9;
+    border: 1px solid var(--rule);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.04);
+    margin-bottom: 18px;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 380px;
+  }
+
+  /* ─── Controls ─── */
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto auto auto;
+    gap: 14px 18px;
+    align-items: end;
+    padding: 18px 20px;
+    background: rgba(255, 252, 240, 0.7);
+    border: 1px solid var(--rule);
+    margin-bottom: 14px;
+  }
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 100px;
+  }
+
+  .control label {
+    font-family: 'IBM Plex Mono', 'Menlo', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  select, input[type=range] {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 5px 6px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+  }
+
+  input[type=range] {
+    padding: 0;
+    accent-color: var(--ink);
+  }
+
+  button {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    padding: 8px 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+  }
+
+  button:hover { background: var(--accent-red); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; background: var(--ink); }
+
+  button.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+
+  button.secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ─── Stats ─── */
+  .meter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 12px 20px;
+    background: rgba(255, 252, 240, 0.5);
+    border: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', 'Menlo', monospace;
+    font-size: 12px;
+  }
+
+  .meter span { color: var(--ink-soft); }
+  .meter b { font-weight: 600; color: var(--ink); }
+
+  /* ─── Algorithm notes ─── */
+  .notes {
+    margin-top: 26px;
+    columns: 2;
+    column-gap: 36px;
+    column-rule: 1px solid var(--rule);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .notes h3 {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+    margin-top: 8px;
+    break-after: avoid;
+  }
+
+  .notes h3:first-child { margin-top: 0; }
+  .notes p { margin-bottom: 10px; }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 800px) {
+    body { padding: 20px 16px; }
+    h1 { font-size: 28px; }
+    header { grid-template-columns: 1fr; }
+    .masthead { text-align: left; }
+    .controls { grid-template-columns: 1fr 1fr; }
+    .meter { grid-template-columns: 1fr 1fr; }
+    .notes { columns: 1; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Sound of Sorting</h1>
+      <div class="tagline">Five algorithms, made audible. Each has its own song.</div>
+    </div>
+    <div class="masthead">
+      <div>The <em>Night Gazette</em></div>
+      <div>Vol. I — Toybox No. 12</div>
+      <div>2026-04-16 · V</div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="control">
+      <label for="algo">Algorithm</label>
+      <select id="algo">
+        <option value="bubble">Bubble Sort</option>
+        <option value="insertion" selected>Insertion Sort</option>
+        <option value="selection">Selection Sort</option>
+        <option value="quick">Quicksort</option>
+        <option value="merge">Merge Sort</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="size">Elements</label>
+      <select id="size">
+        <option value="16">16</option>
+        <option value="32">32</option>
+        <option value="64" selected>64</option>
+        <option value="128">128</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="shape">Dataset</label>
+      <select id="shape">
+        <option value="random" selected>Random</option>
+        <option value="sorted">Sorted</option>
+        <option value="reverse">Reverse</option>
+        <option value="few">Few uniques</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="speed">Speed (ops/sec): <span id="speed-val">120</span></label>
+      <input type="range" id="speed" min="5" max="500" value="120">
+    </div>
+
+    <div class="control">
+      <label for="volume">Volume: <span id="volume-val">35</span></label>
+      <input type="range" id="volume" min="0" max="100" value="35">
+    </div>
+
+    <button id="run">▶  Run</button>
+    <button class="secondary" id="step">Step</button>
+    <button class="secondary" id="reset">Reset</button>
+  </div>
+
+  <div class="meter">
+    <div><span>Comparisons:</span> <b id="comparisons">0</b></div>
+    <div><span>Writes:</span> <b id="writes">0</b></div>
+    <div><span>Elapsed:</span> <b id="elapsed">0.00s</b></div>
+    <div><span>Status:</span> <b id="status">idle</b></div>
+  </div>
+
+  <section class="notes">
+    <h3>Bubble Sort — O(n²)</h3>
+    <p>Swap adjacent out-of-order pairs, sweep after sweep. The sound is a slow ascending wash; the largest values bubble to the top one pass at a time, and you hear that ascent as a rising drone.</p>
+
+    <h3>Insertion Sort — O(n²)</h3>
+    <p>Slide each new element back into its place in the sorted prefix. Like sorting a hand of cards. The song is gentle and patient, with little ratchets backwards.</p>
+
+    <h3>Selection Sort — O(n²)</h3>
+    <p>Scan, find the minimum, swap it to the front. Repeat. The most architectural of the slow sorts — long quiet sweeps punctuated by single decisive thuds.</p>
+
+    <h3>Quicksort — O(n log n) avg</h3>
+    <p>Pick a pivot, partition around it, recurse. The most chaotic song: bursts of partitioning at different scales overlap into something like sparse jazz.</p>
+
+    <h3>Merge Sort — O(n log n)</h3>
+    <p>Divide, recursively sort, merge back. The merges are the music — long, even cascades. The most orchestral of the algorithms.</p>
+  </section>
+
+  <footer>
+    Built one night by Virgil. Press <b>M</b> to mute. Source code lives in the toybox.
+  </footer>
+
+<script>
+(() => {
+  'use strict';
+
+  // ─── State ───────────────────────────────────────────────────────────
+  const state = {
+    array: [],
+    n: 64,
+    indices: { compare: [-1, -1], write: -1, sorted: new Set() },
+    running: false,
+    paused: false,
+    iterator: null,
+    comparisons: 0,
+    writes: 0,
+    startTime: 0,
+    elapsedMs: 0,
+    rafId: null,
+    accumulator: 0,
+    lastFrameTime: 0,
+    speed: 120, // ops/sec
+    volume: 0.35,
+    muted: false,
+    audioCtx: null,
+  };
+
+  // ─── DOM ─────────────────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  // ─── Audio ───────────────────────────────────────────────────────────
+  function ensureAudio() {
+    if (!state.audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      state.audioCtx = new Ctx();
+    }
+    if (state.audioCtx.state === 'suspended') {
+      state.audioCtx.resume();
+    }
+  }
+
+  function playTone(value) {
+    if (state.muted || state.volume === 0) return;
+    const ac = state.audioCtx;
+    if (!ac) return;
+
+    // Map value (1..n) to frequency (200 Hz .. 1200 Hz) logarithmically
+    const t = (value - 1) / Math.max(1, state.n - 1);
+    const minFreq = 220, maxFreq = 1100;
+    const freq = minFreq * Math.pow(maxFreq / minFreq, t);
+
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const now = ac.currentTime;
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+
+    // Tiny soft pluck: attack 5ms, decay 80ms
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(state.volume * 0.35, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.090);
+
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + 0.10);
+  }
+
+  // ─── Dataset generation ──────────────────────────────────────────────
+  function makeArray(n, shape) {
+    const arr = [];
+    if (shape === 'sorted') {
+      for (let i = 1; i <= n; i++) arr.push(i);
+    } else if (shape === 'reverse') {
+      for (let i = n; i >= 1; i--) arr.push(i);
+    } else if (shape === 'few') {
+      const buckets = Math.max(2, Math.floor(n / 8));
+      for (let i = 0; i < n; i++) {
+        arr.push(1 + Math.floor(Math.random() * buckets) * Math.floor(n / buckets));
+      }
+    } else {
+      // random
+      for (let i = 1; i <= n; i++) arr.push(i);
+      for (let i = n - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    return arr;
+  }
+
+  // ─── Sorting algorithms (generator pattern) ─────────────────────────
+  // Each yields step objects: { type: 'compare'|'write'|'mark-sorted'|'unmark', ...indices }
+  // The driver applies them, plays sound, redraws.
+
+  function* bubbleSort(a) {
+    const n = a.length;
+    for (let i = 0; i < n - 1; i++) {
+      let swapped = false;
+      for (let j = 0; j < n - 1 - i; j++) {
+        yield { type: 'compare', i: j, j: j + 1 };
+        if (a[j] > a[j + 1]) {
+          [a[j], a[j + 1]] = [a[j + 1], a[j]];
+          yield { type: 'write', i: j, value: a[j] };
+          yield { type: 'write', i: j + 1, value: a[j + 1] };
+          swapped = true;
+        }
+      }
+      yield { type: 'mark-sorted', i: n - 1 - i };
+      if (!swapped) {
+        for (let k = 0; k < n - 1 - i; k++) yield { type: 'mark-sorted', i: k };
+        return;
+      }
+    }
+    yield { type: 'mark-sorted', i: 0 };
+  }
+
+  function* insertionSort(a) {
+    const n = a.length;
+    yield { type: 'mark-sorted', i: 0 };
+    for (let i = 1; i < n; i++) {
+      const key = a[i];
+      let j = i - 1;
+      while (j >= 0) {
+        yield { type: 'compare', i: j, j: j + 1 };
+        if (a[j] > key) {
+          a[j + 1] = a[j];
+          yield { type: 'write', i: j + 1, value: a[j + 1] };
+          j--;
+        } else break;
+      }
+      a[j + 1] = key;
+      yield { type: 'write', i: j + 1, value: key };
+      yield { type: 'mark-sorted', i };
+    }
+  }
+
+  function* selectionSort(a) {
+    const n = a.length;
+    for (let i = 0; i < n - 1; i++) {
+      let minIdx = i;
+      for (let j = i + 1; j < n; j++) {
+        yield { type: 'compare', i: minIdx, j };
+        if (a[j] < a[minIdx]) minIdx = j;
+      }
+      if (minIdx !== i) {
+        [a[i], a[minIdx]] = [a[minIdx], a[i]];
+        yield { type: 'write', i, value: a[i] };
+        yield { type: 'write', i: minIdx, value: a[minIdx] };
+      }
+      yield { type: 'mark-sorted', i };
+    }
+    yield { type: 'mark-sorted', i: n - 1 };
+  }
+
+  function* quickSort(a, lo = 0, hi = a.length - 1) {
+    if (lo >= hi) {
+      if (lo === hi) yield { type: 'mark-sorted', i: lo };
+      return;
+    }
+    // Lomuto partition with last element as pivot
+    const pivot = a[hi];
+    let i = lo - 1;
+    for (let j = lo; j < hi; j++) {
+      yield { type: 'compare', i: j, j: hi };
+      if (a[j] < pivot) {
+        i++;
+        if (i !== j) {
+          [a[i], a[j]] = [a[j], a[i]];
+          yield { type: 'write', i, value: a[i] };
+          yield { type: 'write', i: j, value: a[j] };
+        }
+      }
+    }
+    [a[i + 1], a[hi]] = [a[hi], a[i + 1]];
+    yield { type: 'write', i: i + 1, value: a[i + 1] };
+    yield { type: 'write', i: hi, value: a[hi] };
+    yield { type: 'mark-sorted', i: i + 1 };
+    yield* quickSort(a, lo, i);
+    yield* quickSort(a, i + 2, hi);
+  }
+
+  function* mergeSort(a, lo = 0, hi = a.length - 1) {
+    if (lo >= hi) return;
+    const mid = (lo + hi) >> 1;
+    yield* mergeSort(a, lo, mid);
+    yield* mergeSort(a, mid + 1, hi);
+    // merge
+    const left = a.slice(lo, mid + 1);
+    const right = a.slice(mid + 1, hi + 1);
+    let i = 0, j = 0, k = lo;
+    while (i < left.length && j < right.length) {
+      yield { type: 'compare', i: lo + i, j: mid + 1 + j };
+      if (left[i] <= right[j]) {
+        a[k] = left[i++];
+      } else {
+        a[k] = right[j++];
+      }
+      yield { type: 'write', i: k, value: a[k] };
+      k++;
+    }
+    while (i < left.length) {
+      a[k] = left[i++];
+      yield { type: 'write', i: k, value: a[k] };
+      k++;
+    }
+    while (j < right.length) {
+      a[k] = right[j++];
+      yield { type: 'write', i: k, value: a[k] };
+      k++;
+    }
+    if (lo === 0 && hi === a.length - 1) {
+      for (let m = 0; m < a.length; m++) yield { type: 'mark-sorted', i: m };
+    }
+  }
+
+  const algorithms = {
+    bubble: bubbleSort,
+    insertion: insertionSort,
+    selection: selectionSort,
+    quick: quickSort,
+    merge: mergeSort,
+  };
+
+  // ─── Driver ──────────────────────────────────────────────────────────
+  function applyStep(step) {
+    if (step.type === 'compare') {
+      state.indices.compare = [step.i, step.j];
+      state.indices.write = -1;
+      state.comparisons++;
+      // Tone is the average of the two compared values
+      const v = (state.array[step.i] + state.array[step.j]) / 2;
+      playTone(v);
+    } else if (step.type === 'write') {
+      state.indices.write = step.i;
+      state.indices.compare = [-1, -1];
+      state.array[step.i] = step.value;
+      state.writes++;
+      playTone(step.value);
+    } else if (step.type === 'mark-sorted') {
+      state.indices.sorted.add(step.i);
+    } else if (step.type === 'unmark') {
+      state.indices.sorted.delete(step.i);
+    }
+  }
+
+  function tick(now) {
+    if (!state.running) return;
+    if (state.paused) {
+      state.lastFrameTime = now;
+      state.rafId = requestAnimationFrame(tick);
+      return;
+    }
+    if (!state.lastFrameTime) state.lastFrameTime = now;
+    const dt = (now - state.lastFrameTime) / 1000;
+    state.lastFrameTime = now;
+    state.elapsedMs += dt * 1000;
+    state.accumulator += dt * state.speed;
+
+    let stepsThisFrame = Math.min(50, Math.floor(state.accumulator));
+    state.accumulator -= stepsThisFrame;
+
+    while (stepsThisFrame-- > 0) {
+      const next = state.iterator.next();
+      if (next.done) {
+        finishRun();
+        break;
+      }
+      applyStep(next.value);
+    }
+
+    updateMeter();
+    draw();
+
+    if (state.running) state.rafId = requestAnimationFrame(tick);
+  }
+
+  function finishRun() {
+    state.running = false;
+    state.paused = false;
+    state.iterator = null;
+    // Mark all sorted (in case algorithm didn't yield them all)
+    for (let i = 0; i < state.array.length; i++) state.indices.sorted.add(i);
+    state.indices.compare = [-1, -1];
+    state.indices.write = -1;
+    $('status').textContent = 'done';
+    $('run').textContent = '▶  Run';
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    state.rafId = null;
+    draw();
+    updateMeter();
+    // Victory sweep
+    sweepTone();
+  }
+
+  function sweepTone() {
+    if (state.muted) return;
+    ensureAudio();
+    const ac = state.audioCtx;
+    if (!ac) return;
+    const sortedArr = [...state.array];
+    const total = 0.6;
+    sortedArr.forEach((v, i) => {
+      const when = ac.currentTime + (i / sortedArr.length) * total;
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      const t = (v - 1) / Math.max(1, state.n - 1);
+      const freq = 220 * Math.pow(5, t);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, when);
+      gain.gain.setValueAtTime(0, when);
+      gain.gain.linearRampToValueAtTime(state.volume * 0.25, when + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, when + 0.06);
+      osc.connect(gain).connect(ac.destination);
+      osc.start(when);
+      osc.stop(when + 0.07);
+    });
+  }
+
+  // ─── Drawing ─────────────────────────────────────────────────────────
+  function draw() {
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, w, h);
+
+    const n = state.array.length;
+    const pad = 8;
+    const barW = (w - pad * 2) / n;
+    const maxVal = state.n;
+
+    for (let i = 0; i < n; i++) {
+      const v = state.array[i];
+      const barH = (v / maxVal) * (h - pad * 2);
+      const x = pad + i * barW;
+      const y = h - pad - barH;
+
+      // Color logic
+      let fill = '#3a3225';
+      if (state.indices.compare[0] === i || state.indices.compare[1] === i) {
+        fill = '#c89a3a';
+      }
+      if (state.indices.write === i) {
+        fill = '#b8462e';
+      }
+      if (state.indices.sorted.has(i)) {
+        fill = '#5e7c3c';
+      }
+
+      ctx.fillStyle = fill;
+      ctx.fillRect(x + 0.5, y, Math.max(1, barW - 1.5), barH);
+    }
+  }
+
+  function updateMeter() {
+    $('comparisons').textContent = state.comparisons;
+    $('writes').textContent = state.writes;
+    $('elapsed').textContent = (state.elapsedMs / 1000).toFixed(2) + 's';
+  }
+
+  // ─── Reset / Start ───────────────────────────────────────────────────
+  function reset() {
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    state.rafId = null;
+    state.running = false;
+    state.paused = false;
+    state.iterator = null;
+    state.comparisons = 0;
+    state.writes = 0;
+    state.elapsedMs = 0;
+    state.accumulator = 0;
+    state.lastFrameTime = 0;
+    state.indices = { compare: [-1, -1], write: -1, sorted: new Set() };
+    state.n = parseInt($('size').value, 10);
+    state.array = makeArray(state.n, $('shape').value);
+    $('status').textContent = 'idle';
+    $('run').textContent = '▶  Run';
+    updateMeter();
+    draw();
+  }
+
+  function start() {
+    if (state.running && !state.paused) {
+      // Pause
+      state.paused = true;
+      $('status').textContent = 'paused';
+      $('run').textContent = '▶  Resume';
+      return;
+    }
+    if (state.running && state.paused) {
+      state.paused = false;
+      state.lastFrameTime = 0;
+      $('status').textContent = 'running';
+      $('run').textContent = '⏸  Pause';
+      return;
+    }
+    // Fresh run — iterator drives ops by index; applyStep mutates state.array
+    ensureAudio();
+    if (!state.iterator) {
+      state.iterator = algorithms[$('algo').value](state.array);
+    }
+    state.running = true;
+    state.paused = false;
+    state.lastFrameTime = 0;
+    $('status').textContent = 'running';
+    $('run').textContent = '⏸  Pause';
+    state.rafId = requestAnimationFrame(tick);
+  }
+
+  function singleStep() {
+    if (!state.iterator) {
+      ensureAudio();
+      state.iterator = algorithms[$('algo').value](state.array);
+    }
+    const next = state.iterator.next();
+    if (next.done) {
+      finishRun();
+    } else {
+      applyStep(next.value);
+      $('status').textContent = 'stepped';
+      draw();
+      updateMeter();
+    }
+  }
+
+  // ─── Wire up ─────────────────────────────────────────────────────────
+  $('run').addEventListener('click', start);
+  $('step').addEventListener('click', singleStep);
+  $('reset').addEventListener('click', reset);
+
+  $('algo').addEventListener('change', reset);
+  $('size').addEventListener('change', reset);
+  $('shape').addEventListener('change', reset);
+
+  $('speed').addEventListener('input', (e) => {
+    state.speed = parseInt(e.target.value, 10);
+    $('speed-val').textContent = state.speed;
+  });
+
+  $('volume').addEventListener('input', (e) => {
+    const v = parseInt(e.target.value, 10);
+    state.volume = v / 100;
+    $('volume-val').textContent = v;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'm' || e.key === 'M') {
+      state.muted = !state.muted;
+      $('volume-val').textContent = state.muted ? 'muted' : Math.round(state.volume * 100);
+    } else if (e.key === ' ') {
+      e.preventDefault();
+      start();
+    } else if (e.key === 'r' || e.key === 'R') {
+      reset();
+    } else if (e.key === 's' || e.key === 'S') {
+      singleStep();
+    }
+  });
+
+  // ─── Init ────────────────────────────────────────────────────────────
+  resizeCanvas();
+  reset();
+})();
+</script>
+</body>
+</html>
