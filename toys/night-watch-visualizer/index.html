@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Night Watch — the record</title>
+  <style>
+    /* Night Gazette lineage — paper cream, ink black, letterpress serif */
+    :root {
+      --paper: #f6f1e3;
+      --ink: #1a1a1a;
+      --muted: #666;
+      --accent: #8b2a14;   /* deep oxblood for urgent */
+      --warm: #8b6914;     /* antique gold for medium */
+      --rule: #c9bfa6;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "EB Garamond", "Cormorant Garamond", Georgia, serif;
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+    header {
+      padding: 2.5rem 3rem 1.5rem;
+      border-bottom: 1.5px double var(--rule);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.6rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    header h1 .italic { font-style: italic; color: var(--muted); font-weight: 400; }
+    header .dek {
+      margin-top: 0.3rem;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 0;
+      min-height: calc(100vh - 10rem);
+    }
+    section.timeline {
+      padding: 2rem 1.5rem 2rem 3rem;
+      overflow-x: auto;
+    }
+    aside.sidebar {
+      padding: 2rem 3rem 2rem 1.5rem;
+      border-left: 1px solid var(--rule);
+      font-size: 0.92rem;
+    }
+    aside.sidebar h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    aside.sidebar ul {
+      margin: 0 0 1.5rem; padding: 0 0 0 1.1rem;
+    }
+    aside.sidebar li { margin-bottom: 0.2rem; }
+
+    /* Tick columns — horizontal scroll */
+    .ticks {
+      display: flex;
+      gap: 1.2rem;
+      min-width: max-content;
+    }
+    .tick {
+      min-width: 220px;
+      max-width: 260px;
+      border-left: 1px solid var(--rule);
+      padding: 0 0.9rem;
+      position: relative;
+    }
+    .tick .time {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tick .gloss {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--ink);
+      margin: 0.15rem 0 0.8rem;
+      line-height: 1.25;
+    }
+    .tick .events { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .event {
+      font-size: 0.85rem;
+      border-left: 3px solid var(--rule);
+      padding: 0.2rem 0.5rem;
+    }
+    .event.clean { border-color: #3a6b2e; }
+    .event.urgent { border-color: var(--accent); }
+    .event.warn { border-color: var(--warm); }
+    .event.noop { border-color: var(--muted); color: var(--muted); font-style: italic; }
+
+    .event .title { font-weight: 600; }
+    .event .meta { color: var(--muted); font-size: 0.78rem; }
+
+    /* Agent thread rendering — SVG overlay (future) */
+    /* For the scaffold, threads are just stacked blocks */
+
+    /* File-protocol banner — toybox convention */
+    .file-banner {
+      display: none;
+      background: #fff3cd;
+      color: #5a4a00;
+      border-bottom: 1px solid #d4b44b;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    body.file-protocol .file-banner { display: block; }
+
+    footer {
+      padding: 1rem 3rem 2rem;
+      border-top: 1.5px double var(--rule);
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="file-banner">
+    ⚠ Running under <code>file://</code> — the parser can only read from the
+    textarea below. For the full experience run <code>./serve.sh</code> and
+    open <a href="http://localhost:8000/">localhost:8000</a>.
+  </div>
+
+  <header>
+    <h1>The Night Watch — <span class="italic">a record</span></h1>
+    <div class="dek" id="deck">Virgil, night of —. Scroll sideways for the hours.</div>
+  </header>
+
+  <main>
+    <section class="timeline">
+      <div class="ticks" id="ticks">
+        <!-- Scaffold sample. Real parser lands in the next session. -->
+        <div class="tick">
+          <div class="time">Tick 1 · 03:03 – 03:22</div>
+          <div class="gloss">Carry-over cleared. Five coherent commits, one essay.</div>
+          <div class="events">
+            <div class="event clean">
+              <div class="title">DEV-419 closed as no-op</div>
+              <div class="meta">already shipped · PR #896</div>
+            </div>
+            <div class="event clean">
+              <div class="title">stochastic-oc pushed</div>
+              <div class="meta">5 commits · origin/master</div>
+            </div>
+            <div class="event clean">
+              <div class="title">research note · future avenues</div>
+              <div class="meta">4 methods · arxiv bibliography</div>
+            </div>
+          </div>
+        </div>
+        <div class="tick">
+          <div class="time">Tick 2 · 03:13 – 03:19</div>
+          <div class="gloss">Two agents land. Santander bug found.</div>
+          <div class="events">
+            <div class="event clean">
+              <div class="title">PR #987 (DEV-528)</div>
+              <div class="meta">implementer · submitted</div>
+            </div>
+            <div class="event warn">
+              <div class="title">DEV-573 investigation</div>
+              <div class="meta">explore agent · rank-1 hypothesis identified</div>
+            </div>
+            <div class="event">
+              <div class="title">pluma-worktree-audit.sh</div>
+              <div class="meta">growth tool · read-only</div>
+            </div>
+          </div>
+        </div>
+        <div class="tick">
+          <div class="time">Tick 3 · 03:23 – 03:28</div>
+          <div class="gloss">Parallel custodian + implementer. Toybox + essay.</div>
+          <div class="events">
+            <div class="event warn">
+              <div class="title">PR #987 custodian dispatched</div>
+              <div class="meta">bot approve-with-comments · running</div>
+            </div>
+            <div class="event warn">
+              <div class="title">DEV-494 implementer dispatched</div>
+              <div class="meta">currency-sync batch · running</div>
+            </div>
+            <div class="event">
+              <div class="title">essay · "the cost of not writing it down"</div>
+              <div class="meta">~400 words · archival as craft</div>
+            </div>
+          </div>
+        </div>
+        <div class="tick">
+          <div class="time">Tick 4 · 03:33 – 03:41</div>
+          <div class="gloss">DEV-569 P2 planned. Two PRs land.</div>
+          <div class="events">
+            <div class="event clean">
+              <div class="title">PR #987 clean</div>
+              <div class="meta">custodian returned · 4 comments addressed</div>
+            </div>
+            <div class="event warn">
+              <div class="title">PR #988 (DEV-494) submitted</div>
+              <div class="meta">awaiting CI</div>
+            </div>
+            <div class="event">
+              <div class="title">DEV-569 P2 plan saved</div>
+              <div class="meta">7-step stackable · risk map included</div>
+            </div>
+          </div>
+        </div>
+        <div class="tick">
+          <div class="time">Tick 5 · 03:43 – ?</div>
+          <div class="gloss" style="color:var(--muted)">(in progress)</div>
+          <div class="events">
+            <div class="event warn">
+              <div class="title">DEV-573 implementer running</div>
+              <div class="meta">waitUntilAccountsStable()</div>
+            </div>
+            <div class="event noop">
+              <div class="title">toybox tick 2 — this page</div>
+              <div class="meta">the record of the record</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <h3>This Session</h3>
+      <p style="margin:0 0 1rem;">
+        Started <strong>03:03 BRT</strong>, 2026-04-17.
+        Cron <code style="font-size:0.85em">11cd13dd</code> ticks every 10 minutes.
+      </p>
+      <h3>Queue</h3>
+      <ul>
+        <li>DEV-528 · <em>merge-ready</em></li>
+        <li>DEV-494 · <em>in-review</em></li>
+        <li>DEV-573 · <em>implementer running</em></li>
+        <li>DEV-569 P2 · <em>planned</em></li>
+        <li>DEV-419 · <em>closed (no-op)</em></li>
+      </ul>
+      <h3>Rituals</h3>
+      <ul>
+        <li>Toybox tick 1 · ✓</li>
+        <li>Toybox tick 2 · in progress (this toy)</li>
+        <li>Essay · ✓</li>
+        <li>Memory hygiene · ✓</li>
+      </ul>
+      <h3>Carry-over</h3>
+      <ul>
+        <li>Disk at 91% · audit tool built · Ruan approves reaps</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>
+    Set in EB Garamond / serif fallback. Single-file. No build step.
+    <br>
+    The parser (read queue → data model) lands on the next toybox tick. This
+    page is scaffold only.
+  </footer>
+
+  <script>
+    // File-protocol detector — toybox convention
+    if (window.location.protocol === "file:") {
+      document.body.classList.add("file-protocol");
+    }
+    // Deck update from current date if present
+    const now = new Date();
+    const iso = now.toISOString().slice(0, 10);
+    document.getElementById("deck").textContent =
+      `Virgil, night of ${iso}. Scroll sideways for the hours.`;
+  </script>
+</body>
+</html>

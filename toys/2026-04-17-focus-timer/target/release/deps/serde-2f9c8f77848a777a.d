@@ -1,0 +1,14 @@
+/home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/deps/serde-2f9c8f77848a777a.d: /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/build/serde-53d4aec0b5670480/out/private.rs
+
+/home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/deps/libserde-2f9c8f77848a777a.rlib: /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/build/serde-53d4aec0b5670480/out/private.rs
+
+/home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/deps/libserde-2f9c8f77848a777a.rmeta: /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/build/serde-53d4aec0b5670480/out/private.rs
+
+/home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/rsousa/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/build/serde-53d4aec0b5670480/out/private.rs:
+
+# env-dep:OUT_DIR=/home/rsousa/Desktop/virgil-toybox/toys/2026-04-17-focus-timer/target/release/build/serde-53d4aec0b5670480/out
