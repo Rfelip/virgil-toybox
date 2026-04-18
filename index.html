@@ -197,6 +197,59 @@
           </div>
         </a>
 
+        <a class="toy-card" href="toys/night-watch-visualizer/">
+          <div class="toy-card-art" aria-hidden="true">
+            <!-- A small captain's-log timeline: tick columns, agent threads, PR outcome nodes -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Paper background -->
+              <rect x="6" y="14" width="88" height="72" fill="#f5efe0" stroke="#2a2419" stroke-width="0.8" />
+              <!-- Faint horizontal rule near top — like a header separator -->
+              <line x1="10" y1="22" x2="90" y2="22" stroke="#8a7a5a" stroke-width="0.3" />
+              <!-- Vertical tick-column guides (5 ticks) -->
+              <line x1="20" y1="26" x2="20" y2="80" stroke="#cfc1a0" stroke-width="0.3" stroke-dasharray="0.6 0.6" />
+              <line x1="36" y1="26" x2="36" y2="80" stroke="#cfc1a0" stroke-width="0.3" stroke-dasharray="0.6 0.6" />
+              <line x1="52" y1="26" x2="52" y2="80" stroke="#cfc1a0" stroke-width="0.3" stroke-dasharray="0.6 0.6" />
+              <line x1="68" y1="26" x2="68" y2="80" stroke="#cfc1a0" stroke-width="0.3" stroke-dasharray="0.6 0.6" />
+              <line x1="84" y1="26" x2="84" y2="80" stroke="#cfc1a0" stroke-width="0.3" stroke-dasharray="0.6 0.6" />
+              <!-- Tick numerals -->
+              <text x="20" y="20" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="3.5" fill="#5a4a30">i</text>
+              <text x="36" y="20" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="3.5" fill="#5a4a30">ii</text>
+              <text x="52" y="20" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="3.5" fill="#5a4a30">iii</text>
+              <text x="68" y="20" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="3.5" fill="#5a4a30">iv</text>
+              <text x="84" y="20" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="3.5" fill="#5a4a30">v</text>
+              <!-- Agent thread A: tick i to iv, ends with a clean PR (green) -->
+              <line x1="20" y1="32" x2="68" y2="32" stroke="#3a3225" stroke-width="0.6" />
+              <circle cx="20" cy="32" r="1.4" fill="#3a3225" />
+              <circle cx="68" cy="32" r="2.2" fill="#7a8a3a" stroke="#2a2419" stroke-width="0.4" />
+              <!-- Agent thread B: tick ii to iv, ends amber (in-review) -->
+              <line x1="36" y1="46" x2="68" y2="46" stroke="#3a3225" stroke-width="0.6" />
+              <circle cx="36" cy="46" r="1.4" fill="#3a3225" />
+              <circle cx="68" cy="46" r="2.2" fill="#c89a3a" stroke="#2a2419" stroke-width="0.4" />
+              <!-- Agent thread C: tick iii, still running — open-ended dashed tail -->
+              <line x1="52" y1="60" x2="80" y2="60" stroke="#3a3225" stroke-width="0.6" />
+              <line x1="80" y1="60" x2="92" y2="60" stroke="#3a3225" stroke-width="0.6" stroke-dasharray="1 1.2" />
+              <circle cx="52" cy="60" r="1.4" fill="#3a3225" />
+              <!-- Closed-ticket flag at tick v -->
+              <line x1="84" y1="74" x2="84" y2="80" stroke="#6b2d2d" stroke-width="0.6" />
+              <path d="M 84 74 L 90 76 L 84 78 Z" fill="#6b2d2d" />
+              <!-- Tiny serif gloss in the bottom margin -->
+              <text x="50" y="88" text-anchor="middle" font-family="'EB Garamond', Georgia, serif" font-size="4" font-style="italic" fill="#5a4a30">a captain's log</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Night Watch Visualizer</h3>
+            <p class="card-sub">a captain's log of the night</p>
+            <p class="card-blurb">
+              Reads a night-watch queue file and renders the session as a
+              horizontal timeline. Agent dispatches braid down each tick;
+              PR outcomes land as colored nodes; closed tickets fly small
+              flags. Not real-time &mdash; the point is the morning-after
+              read.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <!-- When new toys ship they drop in here as more .toy-card anchors -->
 
       </div>
