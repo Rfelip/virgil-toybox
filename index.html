@@ -264,6 +264,63 @@
           </div>
         </a>
 
+        <a class="toy-card" href="https://github.com/Rfelip/virgil-toybox/tree/main/toys/2026-05-04-lsys-clock">
+          <div class="toy-card-art" aria-hidden="true">
+            <!-- A small fern grown from a Lindenmayer rule -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Paper background -->
+              <rect x="6" y="14" width="88" height="72" fill="#f5efe0" stroke="#2a2419" stroke-width="0.8" />
+              <!-- Inset dark panel suggesting terminal -->
+              <rect x="14" y="22" width="72" height="56" fill="#1d1812" stroke="#2a2419" stroke-width="0.6" />
+              <!-- Hand-drawn-feel fern strokes (asterisks made line-thick) -->
+              <g stroke="#7a8a3a" stroke-width="0.8" fill="none" stroke-linecap="round">
+                <!-- Trunk -->
+                <path d="M 50 74 L 50 32" />
+                <!-- Right branches getting smaller upward -->
+                <path d="M 50 70 L 64 60" />
+                <path d="M 50 64 L 62 56" />
+                <path d="M 50 58 L 60 52" />
+                <path d="M 50 52 L 58 48" />
+                <path d="M 50 46 L 56 43" />
+                <path d="M 50 40 L 54 38" />
+                <!-- Left branches mirror -->
+                <path d="M 50 70 L 36 60" />
+                <path d="M 50 64 L 38 56" />
+                <path d="M 50 58 L 40 52" />
+                <path d="M 50 52 L 42 48" />
+                <path d="M 50 46 L 44 43" />
+                <path d="M 50 40 L 46 38" />
+                <!-- Sub-branches on a few -->
+                <path d="M 64 60 L 68 56" />
+                <path d="M 64 60 L 64 53" />
+                <path d="M 36 60 L 32 56" />
+                <path d="M 36 60 L 36 53" />
+                <path d="M 62 56 L 65 52" />
+                <path d="M 38 56 L 35 52" />
+              </g>
+              <!-- Tiny floating asterisks to echo the rendering primitive -->
+              <text x="22" y="78" font-family="'IBM Plex Mono', monospace" font-size="4" fill="#5a6b2a">*  +  *</text>
+              <!-- Time stamp top-right of terminal -->
+              <text x="78" y="28" font-family="'IBM Plex Mono', monospace" font-size="3.6" fill="#c89a3a">14:25</text>
+              <!-- Italic serif gloss in the margin -->
+              <text x="50" y="84" text-anchor="middle" font-family="'EB Garamond', Georgia, serif" font-size="4" font-style="italic" fill="#5a4a30">a clock that grows</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">L-systems Clock</h3>
+            <p class="card-sub">an hour is a shape; a minute, a depth</p>
+            <p class="card-blurb">
+              Eight Lindenmayer systems cycle through the day &mdash;
+              plant, fern, bush, Koch, Sierpinski, dragon, wave, leaf.
+              The hour picks the shape and rotates its seed angle; the
+              minute drives iteration depth. Glance at the figure and
+              you know what time it is, no digits required. Pure stdlib
+              Python, runs in any terminal.
+            </p>
+            <span class="card-cta">view source&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <!-- When new toys ship they drop in here as more .toy-card anchors -->
 
       </div>
