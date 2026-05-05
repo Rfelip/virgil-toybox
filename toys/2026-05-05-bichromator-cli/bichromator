@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+"""bichromator — colour English prose by Latinate vs Germanic root.
+
+Pipe prose through stdin or pass a file path. Words are coloured in
+ANSI: burnt-sienna for Germanic roots, lapis blue for Latinate, dim
+grey for uncertain. A summary line at the end gives counts and the
+G:L ratio — a register fingerprint.
+
+Companion to the HTML toy at toys/2026-05-05-prose-bichromator/.
+Heuristic, not a dictionary. See README.md for classifier details.
+"""
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+# ── ANSI ──────────────────────────────────────────────────────────────
+_RESET = "\033[0m"
+_BOLD = "\033[1m"
+# 256-colour codes that approximate the HTML toy's palette
+_GERMANIC = "\033[38;5;130m"   # burnt sienna ≈ #af5f00
+_LATINATE = "\033[38;5;25m"    # lapis blue ≈ #005faf
+_UNKNOWN = "\033[38;5;244m"    # dim grey
+_GERMANIC_STRONG = "\033[1;38;5;166m"
+_LATINATE_STRONG = "\033[1;38;5;26m"
+
+# ── Wordlists (subset — enough to anchor the suffix/prefix rules) ────
+GERMANIC_CORE = frozenset("""
+the a an and or but if when while because so then than
+i you he she it we they me him her us them my your his its our their
+this that these those here there now never always often sometimes
+is are was were be been being am do did does done doing
+have has had having get got go went gone come came
+make made take took take given giving give gave
+see saw seen look looked find found think thought knew known feel felt
+say said tell told speak spoke talk talked
+want wished need needed
+hear heard listen listened watch watched walk walked run ran
+stand stood sit sat lie lay open closed shut start started
+end ended keep kept leave left hold held bring brought
+write wrote read work worked play played help helped seem
+home house door window wall floor roof room garden yard field wood woods tree leaf leaves
+man men woman women child children boy girl father mother son daughter brother sister friend
+hand arm leg foot feet head eye ear nose mouth tooth teeth heart blood bone
+sun moon sky star stars cloud rain snow wind fire water earth stone sand sea river lake hill mountain
+day night morning evening week month year time summer winter spring autumn fall cold warm hot
+food bread milk meat fish apple beer wine salt
+good bad big small little short tall long wide narrow heavy light fast slow old young new high low strong weak hard soft sharp
+happy sad angry glad afraid tired hungry alone busy
+red green blue black white grey gray brown yellow gold
+yes no not never ever once twice both any every some each more most less many much few all none
+up down in out on off over under through across against with without into onto upon along among between behind before after beyond beside
+first last next top bottom side front back middle near far
+truth lie love hate hope fear dream peace mind soul ghost king queen lord lady folk people life death birth
+unbidden crooked quiet seed bell rang burst lane shouting laughing breath wooden weight
+""".split())
+
+LATINATE_CORE = frozenset("""
+committee deliberated proposition procedure mandate mandates comprehensive evaluation submitted documentation prior authorisation authorization subsequent ratification requires unanimous consensus participating delegations legislative
+create created creation invent invented invention construct constructed construction destroy destroyed destruction produce produced production
+observe observed observation investigate investigated investigation examine examined examination analyse analyze analysis evaluate evaluated conclude concluded conclusion
+explain explained explanation describe described description define defined definition demonstrate demonstrated demonstration
+consider considered consideration decide decided decision determine determined determination intend intended intention propose proposed proposal suggest suggested suggestion
+inform informed information communicate communicated communication express expressed expression
+receive received reception accept accepted acceptance reject rejected rejection approve approved approval permit permitted permission authorize authorized
+obtain obtained provide provided provision supply supplied require required requirement demand demanded request requested
+continue continued continuation initiate initiated commence commenced terminate terminated termination
+increase increased decrease decreased reduce reduced reduction augment augmented diminish diminished alter altered alteration modify modified modification transform transformed transformation
+important significant essential fundamental relevant appropriate adequate sufficient necessary obvious apparent evident probable possible impossible certain uncertain general specific particular various numerous multiple individual collective ordinary extraordinary
+problem question situation condition circumstance circumstances instance example case matter subject object factor element aspect feature quality quantity amount number level degree extent measure value price cost sum total
+government minister president politician citizen population nation national international public private official department agency institution organization organisation association federation council commission bureau ministry tribunal jurisdiction regulation statute article clause paragraph
+liberty equality fraternity justice democracy republic monarchy constitution declaration resolution accord alliance treaty convention agreement contract document manuscript volume chapter sentence grammar language linguistic literary literature poetry narrative novel
+science scientist scientific technology technological engineer engineering mathematics mathematical physics chemistry biology botany geology astronomy medicine medical surgery therapy diagnosis prognosis symptom patient doctor physician hospital pharmacy
+animal vegetable mineral specimen species genus habitat environment ecosystem climate temperature atmosphere planet universe galaxy
+music musician instrument melody harmony rhythm composition composer concert orchestra symphony opera theatre theater drama actor performance audience spectator cinema
+emotion passion pleasure pain grief joy misery comfort solitude fatigue appetite memory imagination intelligence reason logic intuition perception sensation experience attention concentration reflection contemplation meditation conversation
+present presented presentation represent represented representation conceive conceived conception perceive perceived
+prepare prepared preparation organize organized organization arrange arranged arrangement manage managed management direct directed direction operate operated operation function functioned functional
+system method manner mode style format structure model pattern design plan project program programme
+effect affect affected effective cause caused result resulted consequence outcome success successful failure failed attempt attempted effort exert exerted
+during despite throughout via amongst amidst previously subsequently frequently occasionally constantly continually particularly generally specifically essentially fundamentally
+actual actually perhaps probably possibly certainly obviously apparently evidently precisely exactly absolutely completely entirely totally partially relatively comparatively
+""".split())
+
+_SUFFIX_LATINATE = re.compile(
+    r"(tion|sion|ment|ance|ence|ity|ate|ize|ise|ous|ive|ify|ical|ically|"
+    r"esque|ation|itude|escence|escent|ology|ologist|arian|ician|atious)$"
+)
+_SUFFIX_GERMANIC = re.compile(
+    r"(ness|hood|ship|dom|ling|lock|ward|wards|like|ful|less|some|ish|en|ing)$"
+)
+_PREFIX_LATINATE = re.compile(
+    r"^(con|com|pre|pro|trans|inter|retro|ultra|post|sub|super|anti|contra|"
+    r"extra|intra|circum|ex|dis|non|mal|bene|semi|multi|omni|equi|magni|uni|bi|tri|quadri)"
+)
+_PREFIX_GERMANIC = re.compile(r"^(be|un|mis|over|under|out|fore|after|by)")
+
+
+def classify(raw: str) -> tuple[str, int]:
+    w = re.sub(r"[^a-z']", "", raw.lower())
+    if not w or len(w) < 2:
+        return "unknown", 0
+    if w in GERMANIC_CORE:
+        return "germanic", 1
+    if w in LATINATE_CORE:
+        return "latinate", 1
+
+    score = 0
+    if _SUFFIX_LATINATE.search(w):
+        score += 2
+    if _SUFFIX_GERMANIC.search(w):
+        score -= 2
+    if _PREFIX_LATINATE.search(w):
+        score += 1
+    if _PREFIX_GERMANIC.search(w):
+        score -= 1
+    if len(w) >= 9:
+        score += 1
+    if len(w) <= 4:
+        score -= 1
+    if re.search(r"tion|sion|cious|tious|ique", w):
+        score += 2
+    if re.search(r"th|ght|ck|wh|kn", w):
+        score -= 1
+    if re.search(r"ph|ch[oae]", w):
+        score += 1
+
+    if score >= 2:
+        return "latinate", 1 if score >= 3 else 0
+    if score <= -2:
+        return "germanic", 1 if score <= -3 else 0
+    return "unknown", 0
+
+
+def colorize(text: str, *, no_color: bool = False) -> tuple[str, dict[str, int]]:
+    counts = {"germanic": 0, "latinate": 0, "unknown": 0}
+    out: list[str] = []
+    for tok in re.split(r"(\s+|[^\sa-zA-Z']+)", text):
+        if not tok:
+            continue
+        if tok.isspace() or not re.match(r"^[a-zA-Z']+$", tok):
+            out.append(tok)
+            continue
+        cls, strong = classify(tok)
+        counts[cls] += 1
+        if no_color:
+            out.append(tok)
+            continue
+        if cls == "germanic":
+            out.append((_GERMANIC_STRONG if strong else _GERMANIC) + tok + _RESET)
+        elif cls == "latinate":
+            out.append((_LATINATE_STRONG if strong else _LATINATE) + tok + _RESET)
+        else:
+            out.append(_UNKNOWN + tok + _RESET)
+    return "".join(out), counts
+
+
+def _summary(counts: dict[str, int], *, no_color: bool) -> str:
+    g, l, u = counts["germanic"], counts["latinate"], counts["unknown"]
+    total = g + l + u
+    if total == 0:
+        return ""
+    pct = lambda n: f"{100*n/total:5.1f}%"
+    ratio = f"{g/l:.2f}" if l else "∞"
+    if no_color:
+        return (
+            f"\n— {g} Germanic ({pct(g)})  {l} Latinate ({pct(l)})  "
+            f"{u} uncertain ({pct(u)})  G:L = {ratio}"
+        )
+    return (
+        f"\n{_BOLD}— {_GERMANIC}{g} Germanic{_RESET} ({pct(g)})  "
+        f"{_LATINATE}{l} Latinate{_RESET} ({pct(l)})  "
+        f"{_UNKNOWN}{u} uncertain{_RESET} ({pct(u)})  "
+        f"{_BOLD}G:L = {ratio}{_RESET}"
+    )
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    no_color = "--no-color" in args or not sys.stdout.isatty()
+    args = [a for a in args if a != "--no-color"]
+    if "--help" in args or "-h" in args:
+        print(__doc__, file=sys.stderr)
+        print("Usage: bichromator [FILE | -]  [--no-color]", file=sys.stderr)
+        print("Reads stdin if no file or '-' is given.", file=sys.stderr)
+        return 0
+    if args and args[0] != "-":
+        try:
+            text = Path(args[0]).read_text(encoding="utf-8")
+        except OSError as e:
+            print(f"bichromator: {e}", file=sys.stderr)
+            return 1
+    else:
+        text = sys.stdin.read()
+    coloured, counts = colorize(text, no_color=no_color)
+    print(coloured, end="")
+    if not coloured.endswith("\n"):
+        print()
+    print(_summary(counts, no_color=no_color), file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
