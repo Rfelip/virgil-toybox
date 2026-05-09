@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BANG-BANG: Fishery</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f2e9;
+    --panel: #fdfaf4;
+    --ink: #2c2416;
+    --dim: #8b8377;
+    --accent: #c17b4d;
+    --good: #6b8a3f;
+    --bad:  #a84c4c;
+    --line: #e5e0d8;
+    --rule: #d4cec5;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "EB Garamond", "Garamond", serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding: 20px 32px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-size: 24px; margin: 0;
+    letter-spacing: 0.08em;
+    font-weight: normal;
+    font-style: italic;
+  }
+  header .sub { color: var(--dim); font-size: 13px; font-style: normal; }
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+  .intro {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    max-width: 760px;
+  }
+  .intro h2 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: normal;
+    color: var(--accent);
+  }
+  .intro p {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro .meta {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--dim);
+    font-style: italic;
+  }
+  .puzzle-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 22px;
+    border: 1px solid var(--rule);
+  }
+  .puzzle-tabs button {
+    flex: 1;
+    background: var(--panel);
+    color: var(--dim);
+    border: 0;
+    border-right: 1px solid var(--rule);
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    font-weight: normal;
+  }
+  .puzzle-tabs button:last-child { border-right: 0; }
+  .puzzle-tabs button.active {
+    color: var(--accent);
+    background: #fff9f3;
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .puzzle-tabs button .num { color: var(--dim); margin-right: 8px; }
+  .puzzle-tabs button.active .num { color: var(--accent); }
+  .puzzle-tabs button:hover {
+    background: #faf6f0;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .panel h2 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: normal;
+  }
+  .panel .lesson { color: var(--dim); font-size: 15px; margin-bottom: 16px; line-height: 1.5; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 280px; }
+  canvas {
+    display: block;
+    width: 100%;
+    background: #f9f6f1;
+    border: 1px solid var(--rule);
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .controls button {
+    background: #faf6f0;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 40px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .controls button:hover { border-color: var(--accent); background: #fff9f3; }
+  .controls button.sel {
+    background: var(--accent);
+    color: #fdfaf4;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+  .group-label {
+    color: var(--dim);
+    font-size: 13px;
+    margin-right: 10px;
+    align-self: center;
+    letter-spacing: 0.05em;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .stat {
+    background: #f9f6f1;
+    border: 1px solid var(--rule);
+    padding: 12px 14px;
+  }
+  .stat .k { font-size: 12px; color: var(--dim); letter-spacing: 0.08em; font-style: italic; }
+  .stat .v { font-size: 20px; color: var(--ink); margin-top: 4px; font-weight: 500; }
+  .stat.good .v { color: var(--good); }
+  .stat.par .v { color: var(--accent); }
+  .verdict {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-left: 2px solid var(--rule);
+    color: var(--dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .verdict.win { border-left-color: var(--good); color: var(--good); }
+  .verdict.par { border-left-color: var(--accent); color: var(--accent); }
+  .next-round {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+  }
+  .next-round button {
+    flex: 1;
+    background: var(--accent);
+    color: var(--panel);
+    border: 1px solid var(--accent);
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    font-weight: 500;
+  }
+  .next-round button:hover { opacity: 0.85; }
+  footer {
+    text-align: center;
+    color: var(--dim);
+    font-size: 12px;
+    padding: 28px 32px;
+    border-top: 1px solid var(--rule);
+    margin-top: 40px;
+    line-height: 1.6;
+  }
+  .hist-label { font-size: 12px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
+  .file-warn {
+    background: #efe8e1; color: var(--bad);
+    border: 1px solid var(--rule);
+    padding: 12px 14px; margin-bottom: 18px;
+    font-size: 13px;
+    display: none;
+  }
+  .file-warn code {
+    background: #faf6f0;
+    padding: 2px 4px;
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>BANG&nbsp;-&nbsp;BANG&nbsp;:&nbsp;FISHERY</h1>
+  <span class="sub">stochastic-OC puzzle prototype · 2026-05-08</span>
+</header>
+
+<main>
+  <div id="fileWarn" class="file-warn">
+    Note: this toy uses no fetch/modules, so file:// is fine. If anything looks off, run <code>./serve.sh</code> and open <code>http://localhost:8000</code>.
+  </div>
+
+  <div class="intro">
+    <h2>What is bang-bang control?</h2>
+    <p>Optimal control asks: given a system you can influence, what is the best strategy over time? In fishery management, that means deciding when and how hard to harvest.</p>
+    <p>Pontryagin's Maximum Principle tells us that under many conditions, the best strategy is bang-bang: push the control to its extreme (fish hard or don't fish at all). There is no advantage to half-measures—or is there?</p>
+    <p>These three puzzles explore when bang-bang wins, when it can be beaten by a singular arc (steady middle effort), and how switching dynamics shape the optimal policy. Explore stochastic variants and deeper theory in the <a href="https://github.com/Rfelip/personal_obsidian/tree/main/Virgil/research/2026-05-08" style="color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent);">research notes</a>.</p>
+    <div class="meta">Schaefer logistic stock model · integrated with Euler dt=0.1 · par by exhaustive grid search</div>
+  </div>
+
+  <div class="puzzle-tabs" id="tabs"></div>
+
+  <div id="puzzleHost"></div>
+
+  <footer>
+    <div style="border-top: 1px solid var(--rule); padding-top: 20px;">
+      <em>Schaefer logistic fishery:</em> dx/dt = r·x·(1 − x/K) − u·x<br>
+      Reward: ∫ u·x dt with r = 0.6, K = 1, x₀ = 0.3<br>
+      Par values computed by exhaustive search over discrete control sets
+    </div>
+  </footer>
+</main>
+
+<script>
+// ----------------------------------------------------------------------------
+// Schaefer fishery dynamics
+// ----------------------------------------------------------------------------
+// dx/dt = r * x * (1 - x/K) - u * x
+// reward rate = u * x      (price = 1)
+// integrate with simple Euler, dt = 0.1
+//
+// We use the same dynamics across all 3 puzzles, varying horizon, control
+// granularity, and what the player chooses.
+
+const R = 0.6;           // intrinsic growth
+const K = 1.0;           // carrying capacity
+const X0 = 0.3;          // starting stock
+const DT = 0.1;          // integration step
+
+function simulate(controlFn, horizon) {
+  // controlFn(t) -> u in [0,1]
+  let x = X0;
+  let reward = 0;
+  const xs = [x];
+  const us = [];
+  const ts = [0];
+  const steps = Math.round(horizon / DT);
+  for (let i = 0; i < steps; i++) {
+    const t = i * DT;
+    const u = Math.max(0, Math.min(1, controlFn(t)));
+    const dx = R * x * (1 - x / K) - u * x;
+    reward += u * x * DT;
+    x = Math.max(0, x + dx * DT);
+    xs.push(x);
+    us.push(u);
+    ts.push((i + 1) * DT);
+  }
+  return { xs, us, ts, reward, finalStock: x };
+}
+
+// ----------------------------------------------------------------------------
+// Plotting helpers
+// ----------------------------------------------------------------------------
+function clear(ctx, w, h) {
+  ctx.fillStyle = '#f9f6f1';
+  ctx.fillRect(0, 0, w, h);
+}
+
+function drawAxes(ctx, w, h, pad, xLabel, yLabel, xMax, yMax) {
+  ctx.strokeStyle = '#d4cec5';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad, pad);
+  ctx.lineTo(pad, h - pad);
+  ctx.lineTo(w - pad, h - pad);
+  ctx.stroke();
+  ctx.fillStyle = '#8b8377';
+  ctx.font = '13px "EB Garamond", serif';
+  ctx.fillText(xLabel, w - pad - 24, h - pad + 14);
+  ctx.fillText(yLabel, 4, pad + 8);
+  // gridlines
+  ctx.strokeStyle = '#ede9e0';
+  for (let i = 1; i < 5; i++) {
+    const y = pad + (h - 2 * pad) * i / 5;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); ctx.stroke();
+    const x = pad + (w - 2 * pad) * i / 5;
+    ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, h - pad); ctx.stroke();
+  }
+  // tick labels
+  ctx.fillStyle = '#8b8377';
+  for (let i = 0; i <= 5; i++) {
+    const xv = (xMax * i / 5).toFixed(1);
+    const x = pad + (w - 2 * pad) * i / 5;
+    ctx.fillText(xv, x - 6, h - pad + 12);
+    const yv = (yMax * (5 - i) / 5).toFixed(1);
+    const y = pad + (h - 2 * pad) * i / 5;
+    ctx.fillText(yv, 6, y + 3);
+  }
+}
+
+function drawTrajectory(ctx, w, h, sim, horizon) {
+  const pad = 28;
+  clear(ctx, w, h);
+  drawAxes(ctx, w, h, pad, 't', 'x', horizon, 1.0);
+  // stock x(t)
+  ctx.strokeStyle = '#6b8a3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < sim.xs.length; i++) {
+    const px = pad + (w - 2 * pad) * (i * DT) / horizon;
+    const py = (h - pad) - (h - 2 * pad) * Math.min(1, sim.xs[i]);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  // control u(t) overlay (thin, bottom)
+  ctx.strokeStyle = '#c17b4d';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 0; i < sim.us.length; i++) {
+    const px = pad + (w - 2 * pad) * (i * DT) / horizon;
+    const py = (h - pad) - (h - 2 * pad) * 0.25 * sim.us[i];
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  // legend
+  ctx.fillStyle = '#6b8a3f'; ctx.font = '13px "EB Garamond", serif'; ctx.fillText('stock x(t)', w - pad - 110, pad + 4);
+  ctx.fillStyle = '#c17b4d'; ctx.fillText('control u(t)', w - pad - 110, pad + 18);
+}
+
+function drawHistogram(ctx, w, h, choices, parIdx, playerIdx) {
+  // choices: list of {label, value}
+  clear(ctx, w, h);
+  const pad = 28;
+  const maxV = Math.max(...choices.map(c => c.value));
+  const minV = Math.min(0, ...choices.map(c => c.value));
+  const span = maxV - minV || 1;
+  const barW = (w - 2 * pad) / choices.length;
+  ctx.fillStyle = '#8b8377';
+  ctx.font = '13px "EB Garamond", serif';
+  ctx.fillText('reward by choice', pad, pad - 8);
+  for (let i = 0; i < choices.length; i++) {
+    const c = choices[i];
+    const x = pad + i * barW;
+    const bh = (h - 2 * pad) * (c.value - minV) / span;
+    const y = h - pad - bh;
+    if (i === parIdx) ctx.fillStyle = '#c17b4d';
+    else if (i === playerIdx) ctx.fillStyle = '#6b8a3f';
+    else ctx.fillStyle = '#d4cec5';
+    ctx.fillRect(x + 2, y, barW - 4, bh);
+    ctx.fillStyle = '#8b8377';
+    ctx.fillText(c.label, x + 2, h - pad + 12);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Puzzle 1 — Pick the harvest day
+// ----------------------------------------------------------------------------
+// Single instantaneous harvest at chosen day t_h in {1..10}.
+// We simulate u=0 until t_h, then u=1 for one DT-block, then u=0.
+// Reward = (single block harvest) ≈ x(t_h) * 1.0 (a "scoop").
+// To make this feel like a clean choice, reward = x(t_h).
+// Lesson: stock grows logistically; harvest too early = low x, too late = saturated, no benefit.
+//
+// Twist: add a small per-day decay of perceived value (price drops 2% per day),
+// so the optimum isn't t=10. Reward = x(t_h) * 0.98^t_h.
+
+const P1 = {
+  id: 'p1',
+  title: 'PUZZLE 1 — PICK THE HARVEST DAY',
+  lesson: 'When do you scoop? Stock grows over time but the price drops 2% per day. Find the sweet spot.',
+  horizon: 10,
+  choices: [], // built below
+  state: { selected: null },
+};
+for (let t = 1; t <= 10; t++) P1.choices.push({ label: 't=' + t, t });
+
+function p1Reward(t_h) {
+  const sim = simulate((tt) => 0, t_h);
+  return sim.finalStock * Math.pow(0.98, t_h);
+}
+
+P1.choices.forEach(c => c.value = p1Reward(c.t));
+P1.parIdx = P1.choices.reduce((b, c, i, a) => c.value > a[b].value ? i : b, 0);
+P1.par = P1.choices[P1.parIdx].value;
+
+function renderP1(host) {
+  P1.state.selected = P1.state.selected ?? 4;
+  host.innerHTML = `
+    <div class="panel">
+      <h2>${P1.title}</h2>
+      <div class="lesson">${P1.lesson}</div>
+      <div class="row">
+        <div>
+          <canvas id="p1traj" width="460" height="260"></canvas>
+          <div class="controls" id="p1ctl">
+            <span class="group-label">harvest day:</span>
+          </div>
+        </div>
+        <div>
+          <canvas id="p1hist" width="460" height="260"></canvas>
+          <div class="stats">
+            <div class="stat"><div class="k">YOUR REWARD</div><div class="v" id="p1you">—</div></div>
+            <div class="stat par"><div class="k">PAR</div><div class="v" id="p1par">${P1.par.toFixed(3)}</div></div>
+            <div class="stat"><div class="k">RANK</div><div class="v" id="p1rank">—</div></div>
+          </div>
+          <div class="verdict" id="p1v">Pick a day to harvest.</div>
+          <div class="next-round">
+            <button onclick="activate(1)">Next puzzle →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  const ctl = document.getElementById('p1ctl');
+  P1.choices.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.textContent = c.t;
+    b.onclick = () => { P1.state.selected = i; refreshP1(); };
+    ctl.appendChild(b);
+  });
+  refreshP1();
+}
+
+function refreshP1() {
+  const i = P1.state.selected;
+  const c = P1.choices[i];
+  document.querySelectorAll('#p1ctl button').forEach((b, j) => {
+    b.classList.toggle('sel', j === i);
+  });
+  // simulate just the growth, then mark harvest day
+  const ctx = document.getElementById('p1traj').getContext('2d');
+  const sim = simulate(() => 0, P1.horizon);
+  drawTrajectory(ctx, 460, 260, sim, P1.horizon);
+  // overlay harvest marker
+  const pad = 28;
+  const hx = pad + (460 - 2 * pad) * c.t / P1.horizon;
+  ctx.strokeStyle = '#a84c4c';
+  ctx.beginPath(); ctx.moveTo(hx, pad); ctx.lineTo(hx, 260 - pad); ctx.stroke();
+  ctx.fillStyle = '#a84c4c';
+  ctx.font = '13px "EB Garamond", serif';
+  ctx.fillText('harvest', hx + 4, pad + 12);
+
+  const hctx = document.getElementById('p1hist').getContext('2d');
+  drawHistogram(hctx, 460, 260, P1.choices, P1.parIdx, i);
+
+  document.getElementById('p1you').textContent = c.value.toFixed(3);
+  const rank = [...P1.choices].sort((a, b) => b.value - a.value).findIndex(x => x === c) + 1;
+  document.getElementById('p1rank').textContent = rank + '/' + P1.choices.length;
+  const v = document.getElementById('p1v');
+  if (i === P1.parIdx) {
+    v.className = 'verdict win';
+    v.textContent = 'PAR. You found the sweet spot. The stock has grown enough that further waiting only loses you to price decay.';
+  } else if (c.value > P1.par * 0.97) {
+    v.className = 'verdict par';
+    v.textContent = 'Within 3% of par. Close. Try the neighbours.';
+  } else {
+    v.className = 'verdict';
+    v.textContent = c.t < P1.choices[P1.parIdx].t
+      ? 'Too early — the stock is still climbing. Let it grow.'
+      : 'Too late — diminishing returns plus price decay are eating you.';
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Puzzle 2 — The Switch
+// ----------------------------------------------------------------------------
+// Horizon T = 20. Player picks switch time t_s in {0,2,4,...,20}.
+// u = 0 for t < t_s, u = 1 for t >= t_s.
+// Lesson: bang-bang. There IS an optimal switch.
+
+const P2 = {
+  id: 'p2',
+  title: 'PUZZLE 2 — THE SWITCH',
+  lesson: 'You can hold or fish full-throttle, nothing in between. When do you flip the switch?',
+  horizon: 20,
+  choices: [],
+  state: { selected: null },
+};
+for (let t = 0; t <= 20; t += 2) P2.choices.push({ label: 't=' + t, t });
+
+function p2Reward(t_s) {
+  return simulate((tt) => tt < t_s ? 0 : 1, 20).reward;
+}
+P2.choices.forEach(c => c.value = p2Reward(c.t));
+P2.parIdx = P2.choices.reduce((b, c, i, a) => c.value > a[b].value ? i : b, 0);
+P2.par = P2.choices[P2.parIdx].value;
+
+function renderP2(host) {
+  P2.state.selected = P2.state.selected ?? 0;
+  host.innerHTML = `
+    <div class="panel">
+      <h2>${P2.title}</h2>
+      <div class="lesson">${P2.lesson}</div>
+      <div class="row">
+        <div>
+          <canvas id="p2traj" width="460" height="260"></canvas>
+          <div class="controls" id="p2ctl">
+            <span class="group-label">switch time t_s:</span>
+          </div>
+        </div>
+        <div>
+          <canvas id="p2hist" width="460" height="260"></canvas>
+          <div class="stats">
+            <div class="stat"><div class="k">YOUR REWARD</div><div class="v" id="p2you">—</div></div>
+            <div class="stat par"><div class="k">PAR</div><div class="v" id="p2par">${P2.par.toFixed(3)}</div></div>
+            <div class="stat"><div class="k">RANK</div><div class="v" id="p2rank">—</div></div>
+          </div>
+          <div class="verdict" id="p2v">Pick a switch time.</div>
+          <div class="next-round">
+            <button onclick="activate(0)">← Previous</button>
+            <button onclick="activate(2)">Next puzzle →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  const ctl = document.getElementById('p2ctl');
+  P2.choices.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.textContent = c.t;
+    b.onclick = () => { P2.state.selected = i; refreshP2(); };
+    ctl.appendChild(b);
+  });
+  refreshP2();
+}
+
+function refreshP2() {
+  const i = P2.state.selected;
+  const c = P2.choices[i];
+  document.querySelectorAll('#p2ctl button').forEach((b, j) => {
+    b.classList.toggle('sel', j === i);
+  });
+  const ctx = document.getElementById('p2traj').getContext('2d');
+  const sim = simulate((tt) => tt < c.t ? 0 : 1, P2.horizon);
+  drawTrajectory(ctx, 460, 260, sim, P2.horizon);
+
+  const hctx = document.getElementById('p2hist').getContext('2d');
+  drawHistogram(hctx, 460, 260, P2.choices, P2.parIdx, i);
+
+  document.getElementById('p2you').textContent = c.value.toFixed(3);
+  const rank = [...P2.choices].sort((a, b) => b.value - a.value).findIndex(x => x === c) + 1;
+  document.getElementById('p2rank').textContent = rank + '/' + P2.choices.length;
+  const v = document.getElementById('p2v');
+  if (i === P2.parIdx) {
+    v.className = 'verdict win';
+    v.textContent = 'PAR. The classic bang-bang switch — let the stock build, then harvest hard.';
+  } else if (c.value > P2.par * 0.95) {
+    v.className = 'verdict par';
+    v.textContent = 'Within 5% of par. Right neighbourhood.';
+  } else if (c.t < P2.choices[P2.parIdx].t) {
+    v.className = 'verdict';
+    v.textContent = 'You switched too early. The stock had not built up enough.';
+  } else {
+    v.className = 'verdict';
+    v.textContent = 'You waited too long. The remaining horizon is too short to cash in.';
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Puzzle 3 — The Middle Path (singular arc)
+// ----------------------------------------------------------------------------
+// Horizon T = 30, split into 3 blocks of T_b = 10 each.
+// Player picks (u1, u2, u3) ∈ {0, 0.5, 1}^3. 27 combinations.
+// The MSY (maximum sustainable yield) effort for Schaefer is u* = r/2 = 0.3
+// when paired with x = K/2; with our discrete grid {0, 0.5, 1}, u=0.5 is the
+// closest singular-arc analogue and beats pure bang-bang here.
+// Optimum is typically (0, 0.5, 1) — let it grow, hold near MSY, then fish out.
+
+const P3 = {
+  id: 'p3',
+  title: 'PUZZLE 3 — THE MIDDLE PATH',
+  lesson: 'Now u can be 0, ½, or 1 in each of three blocks. Sometimes "hold steady" beats "all or nothing".',
+  horizon: 30,
+  block: 10,
+  choices: [],
+  state: { u1: 1, u2: 1, u3: 1 },
+};
+const U_OPTS = [0, 0.5, 1];
+for (const u1 of U_OPTS) for (const u2 of U_OPTS) for (const u3 of U_OPTS) {
+  P3.choices.push({ u1, u2, u3 });
+}
+function p3Reward(u1, u2, u3) {
+  return simulate((tt) => {
+    if (tt < 10) return u1;
+    if (tt < 20) return u2;
+    return u3;
+  }, 30).reward;
+}
+P3.choices.forEach(c => c.value = p3Reward(c.u1, c.u2, c.u3));
+P3.choices.forEach(c => c.label = `${c.u1}/${c.u2}/${c.u3}`);
+P3.parIdx = P3.choices.reduce((b, c, i, a) => c.value > a[b].value ? i : b, 0);
+P3.par = P3.choices[P3.parIdx].value;
+
+function renderP3(host) {
+  host.innerHTML = `
+    <div class="panel">
+      <h2>${P3.title}</h2>
+      <div class="lesson">${P3.lesson}</div>
+      <div class="row">
+        <div>
+          <canvas id="p3traj" width="460" height="260"></canvas>
+          <div class="controls" id="p3ctl1"><span class="group-label">block 1 (t∈[0,10]):</span></div>
+          <div class="controls" id="p3ctl2"><span class="group-label">block 2 (t∈[10,20]):</span></div>
+          <div class="controls" id="p3ctl3"><span class="group-label">block 3 (t∈[20,30]):</span></div>
+        </div>
+        <div>
+          <canvas id="p3hist" width="460" height="260"></canvas>
+          <div class="stats">
+            <div class="stat"><div class="k">YOUR REWARD</div><div class="v" id="p3you">—</div></div>
+            <div class="stat par"><div class="k">PAR</div><div class="v" id="p3par">${P3.par.toFixed(3)}</div></div>
+            <div class="stat"><div class="k">RANK</div><div class="v" id="p3rank">—</div></div>
+          </div>
+          <div class="verdict" id="p3v">Try (0, ½, 1).</div>
+          <div class="hist-label">Histogram: all 27 (u1,u2,u3) combinations sorted by reward. Par highlighted, you in green.</div>
+          <div class="next-round">
+            <button onclick="activate(1)">← Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  function mkCtl(div, key) {
+    U_OPTS.forEach(u => {
+      const b = document.createElement('button');
+      b.textContent = u === 0.5 ? '½' : u;
+      b.onclick = () => { P3.state[key] = u; refreshP3(); };
+      div.appendChild(b);
+    });
+  }
+  mkCtl(document.getElementById('p3ctl1'), 'u1');
+  mkCtl(document.getElementById('p3ctl2'), 'u2');
+  mkCtl(document.getElementById('p3ctl3'), 'u3');
+  refreshP3();
+}
+
+function refreshP3() {
+  const { u1, u2, u3 } = P3.state;
+  ['p3ctl1', 'p3ctl2', 'p3ctl3'].forEach((id, k) => {
+    const key = ['u1', 'u2', 'u3'][k];
+    document.querySelectorAll('#' + id + ' button').forEach((b, j) => {
+      b.classList.toggle('sel', U_OPTS[j] === P3.state[key]);
+    });
+  });
+  const ctx = document.getElementById('p3traj').getContext('2d');
+  const sim = simulate((tt) => tt < 10 ? u1 : tt < 20 ? u2 : u3, 30);
+  drawTrajectory(ctx, 460, 260, sim, 30);
+
+  // sort histogram by value desc for Zachtronics vibe
+  const sorted = [...P3.choices].map((c, i) => ({ ...c, idx: i }))
+    .sort((a, b) => b.value - a.value);
+  const playerIdx = P3.choices.findIndex(c => c.u1 === u1 && c.u2 === u2 && c.u3 === u3);
+  const sortedPlayerIdx = sorted.findIndex(c => c.idx === playerIdx);
+  const sortedParIdx = sorted.findIndex(c => c.idx === P3.parIdx);
+  // For 27 bars label only top, par, and player
+  const histChoices = sorted.map((c, i) => ({
+    label: i === 0 || i === sortedPlayerIdx || i === sorted.length - 1 ? c.label : '',
+    value: c.value,
+  }));
+  const hctx = document.getElementById('p3hist').getContext('2d');
+  drawHistogram(hctx, 460, 260, histChoices, sortedParIdx, sortedPlayerIdx);
+
+  const c = P3.choices[playerIdx];
+  document.getElementById('p3you').textContent = c.value.toFixed(3);
+  document.getElementById('p3rank').textContent = (sortedPlayerIdx + 1) + '/27';
+  const v = document.getElementById('p3v');
+  const par = P3.choices[P3.parIdx];
+  if (playerIdx === P3.parIdx) {
+    v.className = 'verdict win';
+    v.textContent = `PAR. (${par.u1}, ${par.u2}, ${par.u3}) — the singular control u=½ wins. Holding effort near MSY beats either extreme; the middle "rest" lets the stock recover between harvests.`;
+  } else if (c.value > P3.par * 0.97) {
+    v.className = 'verdict par';
+    v.textContent = 'Within 3% of par. Try a ½ in the middle.';
+  } else {
+    v.className = 'verdict';
+    v.textContent = 'Pure bang-bang leaves yield on the table here. Try u=½ somewhere — it can hold the stock near its productive sweet spot.';
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Tab navigation
+// ----------------------------------------------------------------------------
+const PUZZLES = [
+  { id: 'p1', tab: 'TUTORIAL', name: 'Pick the harvest day', render: renderP1 },
+  { id: 'p2', tab: 'THE SWITCH', name: 'When to stop fishing', render: renderP2 },
+  { id: 'p3', tab: 'MIDDLE PATH', name: 'Bang–singular–bang', render: renderP3 },
+];
+
+function mountTabs() {
+  const tabs = document.getElementById('tabs');
+  PUZZLES.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.innerHTML = `<span class="num">0${i + 1}</span>${p.tab} · ${p.name}`;
+    b.onclick = () => activate(i);
+    tabs.appendChild(b);
+  });
+}
+
+function activate(i) {
+  document.querySelectorAll('#tabs button').forEach((b, j) => b.classList.toggle('active', j === i));
+  PUZZLES[i].render(document.getElementById('puzzleHost'));
+}
+
+mountTabs();
+activate(0);
+</script>
+</body>
+</html>
