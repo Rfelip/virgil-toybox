@@ -117,6 +117,66 @@
 
       <div class="card-grid">
 
+        <a class="toy-card" href="toys/2026-05-09-gravity-sandbox/">
+          <div class="toy-card-art" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="gs-sun" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#f9c74f" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#f9c74f" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="gs-earth" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#4cc9f0" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#4cc9f0" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="gs-moon" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#dee2e6" stop-opacity="0.85"/>
+                  <stop offset="100%" stop-color="#dee2e6" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- Dark space background -->
+              <rect x="6" y="14" width="88" height="72" fill="#0a0a0e" stroke="#1a1a28" stroke-width="0.8"/>
+              <!-- Stars -->
+              <circle cx="18" cy="22" r="0.5" fill="rgba(220,230,255,0.4)"/>
+              <circle cx="34" cy="18" r="0.4" fill="rgba(220,230,255,0.3)"/>
+              <circle cx="72" cy="20" r="0.6" fill="rgba(220,230,255,0.35)"/>
+              <circle cx="85" cy="28" r="0.4" fill="rgba(220,230,255,0.28)"/>
+              <circle cx="15" cy="68" r="0.5" fill="rgba(220,230,255,0.3)"/>
+              <circle cx="90" cy="72" r="0.4" fill="rgba(220,230,255,0.25)"/>
+              <circle cx="60" cy="82" r="0.5" fill="rgba(220,230,255,0.3)"/>
+              <circle cx="25" cy="78" r="0.4" fill="rgba(220,230,255,0.22)"/>
+              <!-- Earth orbit trail (faint ellipse) -->
+              <ellipse cx="42" cy="50" rx="24" ry="24" fill="none" stroke="rgba(76,201,240,0.12)" stroke-width="0.5"/>
+              <!-- Sun glow + core -->
+              <circle cx="42" cy="50" r="12" fill="url(#gs-sun)"/>
+              <circle cx="42" cy="50" r="5" fill="#f9c74f"/>
+              <!-- Earth trail arc -->
+              <path d="M 58 38 A 24 24 0 0 1 65 55" fill="none" stroke="rgba(76,201,240,0.38)" stroke-width="0.8"/>
+              <!-- Earth glow + core -->
+              <circle cx="65" cy="50" r="7" fill="url(#gs-earth)"/>
+              <circle cx="65" cy="50" r="3" fill="#4cc9f0"/>
+              <!-- Moon trail arc -->
+              <path d="M 69 47 A 5 5 0 0 1 70 53" fill="none" stroke="rgba(222,226,230,0.32)" stroke-width="0.6"/>
+              <!-- Moon -->
+              <circle cx="70" cy="50" r="1.4" fill="#dee2e6"/>
+              <!-- Italic serif gloss -->
+              <text x="50" y="84" text-anchor="middle" font-family="'EB Garamond', Georgia, serif" font-size="3.8" font-style="italic" fill="rgba(140,160,200,0.45)">fold time around a body</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Gravity Sandbox</h3>
+            <p class="card-sub">N-body simulation with trail decay</p>
+            <p class="card-blurb">
+              Place bodies by click-dragging to set velocity; scroll to resize.
+              Velocity Verlet integration with softened gravity keeps orbits
+              stable. Five presets: Sun&ndash;Earth&ndash;Moon, the Chenciner&ndash;Montgomery
+              figure-8, Trojan asteroids, three-body chaos, and a random cloud.
+              G slider, trail-length slider, optional collision merging.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <a class="toy-card" href="toys/2026-05-09-markov-visualizer/">
           <div class="toy-card-art" aria-hidden="true">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">

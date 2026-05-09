@@ -1,0 +1,64 @@
+{
+  "presets": [
+    {
+      "id": "sun-earth-moon",
+      "name": "Sun–Earth–Moon",
+      "description": "A scaled-down solar neighbourhood. The Sun anchors; Earth orbits; the Moon rides Earth's wake.",
+      "bodies": [
+        { "x": 0.50, "y": 0.50, "vx": 0,        "vy": 0,        "mass": 1000, "color": "#f9c74f", "name": "Sun"  },
+        { "x": 0.72, "y": 0.50, "vx": 0,        "vy": 0.0155,   "mass": 3,    "color": "#4cc9f0", "name": "Earth" },
+        { "x": 0.74, "y": 0.50, "vx": 0,        "vy": 0.0165,   "mass": 0.04, "color": "#dee2e6", "name": "Moon"  }
+      ],
+      "G": 1.0,
+      "softening": 0.002
+    },
+    {
+      "id": "figure-8",
+      "name": "Figure-8 (Chenciner–Montgomery)",
+      "description": "Three equal masses chasing each other on a stable figure-8 choreography. Discovered numerically by Moore (1993), proved by Chenciner & Montgomery (2000).",
+      "bodies": [
+        { "x": 0.5,      "y": 0.57,    "vx":  0.3931, "vy":  0.0,    "mass": 1, "color": "#f8961e", "name": "Body A" },
+        { "x": 0.3477,   "y": 0.50,    "vx": -0.1966, "vy": -0.3403, "mass": 1, "color": "#43aa8b", "name": "Body B" },
+        { "x": 0.6523,   "y": 0.50,    "vx": -0.1966, "vy":  0.3403, "mass": 1, "color": "#f94144", "name": "Body C" }
+      ],
+      "G": 1.0,
+      "softening": 0.001
+    },
+    {
+      "id": "trojan",
+      "name": "Trojan Asteroids",
+      "description": "A Jupiter-analogue with two Trojan clouds sitting at the L4 and L5 Lagrange points, 60 degrees ahead and behind.",
+      "bodies": [
+        { "x": 0.50, "y": 0.50, "vx": 0,        "vy": 0,       "mass": 800,  "color": "#f9c74f", "name": "Star"    },
+        { "x": 0.72, "y": 0.50, "vx": 0,        "vy": 0.0141,  "mass": 2.5,  "color": "#f8961e", "name": "Jupiter" },
+        { "x": 0.61, "y": 0.69, "vx": -0.01222, "vy": 0.00706, "mass": 0.01, "color": "#90e0ef", "name": "L4-1"   },
+        { "x": 0.61, "y": 0.31, "vx":  0.01222, "vy": 0.00706, "mass": 0.01, "color": "#90e0ef", "name": "L4-2"   },
+        { "x": 0.83, "y": 0.69, "vx": -0.01222, "vy":-0.00706, "mass": 0.01, "color": "#caf0f8", "name": "L5-1"   },
+        { "x": 0.83, "y": 0.31, "vx":  0.01222, "vy":-0.00706, "mass": 0.01, "color": "#caf0f8", "name": "L5-2"   }
+      ],
+      "G": 1.0,
+      "softening": 0.002
+    },
+    {
+      "id": "random-cloud",
+      "name": "Random N-body Cloud",
+      "description": "Twenty bodies scattered in a disc with random low velocities. Outcomes: cluster collapse, ejections, resonance chains, or slow dispersal.",
+      "bodies": "random",
+      "randomCount": 20,
+      "G": 1.0,
+      "softening": 0.003
+    },
+    {
+      "id": "three-chaos",
+      "name": "Three-Body Chaos",
+      "description": "Three unequal masses placed symmetrically but with a tiny perturbation. Sensitive to initial conditions — every run diverges from the last.",
+      "bodies": [
+        { "x": 0.40, "y": 0.42, "vx":  0.012, "vy":  0.008, "mass": 5,  "color": "#f94144", "name": "Heavy"  },
+        { "x": 0.60, "y": 0.42, "vx": -0.010, "vy":  0.009, "mass": 3,  "color": "#43aa8b", "name": "Medium" },
+        { "x": 0.50, "y": 0.62, "vx":  0.001, "vy": -0.015, "mass": 1,  "color": "#4cc9f0", "name": "Light"  }
+      ],
+      "G": 1.0,
+      "softening": 0.002
+    }
+  ]
+}
