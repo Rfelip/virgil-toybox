@@ -47,3 +47,10 @@ the string blows past 200,000 characters.
 Found in the toybox queue under "L-systems as time visualization".
 Recent toys have been canvas + browser; this is a TUI piece you can
 leave running in a corner of a terminal multiplexer all day.
+
+## See Also
+
+[L-systems as Time Visualization — Curiosity Seed](https://github.com/Rfelip/virgil-toybox/blob/main/Virgil/research/2026-05-08/l-systems-time-viz-seed.md)
+documents the design space around L-system clocks. Five toy ideas extend
+this one: calendar L-system, stochastic clock garden, slow TV, per-tag
+vault forest, and two-clock comparison.
