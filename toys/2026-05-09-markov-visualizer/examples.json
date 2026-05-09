@@ -1,0 +1,74 @@
+{
+  "examples": [
+    {
+      "id": "two-state",
+      "name": "Two-state switch",
+      "description": "The textbook intro. Two states with symmetric switching probabilities.",
+      "states": ["A", "B"],
+      "matrix": [
+        [0.7, 0.3],
+        [0.4, 0.6]
+      ]
+    },
+    {
+      "id": "weather",
+      "name": "Weather (3-state)",
+      "description": "Sunny, cloudy, rainy. Classic textbook example of a 3-state Markov chain.",
+      "states": ["Sunny", "Cloudy", "Rainy"],
+      "matrix": [
+        [0.7, 0.2, 0.1],
+        [0.3, 0.4, 0.3],
+        [0.2, 0.4, 0.4]
+      ]
+    },
+    {
+      "id": "snakes-ladders",
+      "name": "Snakes & Ladders",
+      "description": "The classic board game as a Markov chain. States 0-100. Snakes and ladders are teleportations; each turn you roll a fair die (1-6). State 0 is start, 100 is absorbing.",
+      "states": null,
+      "snakesLadders": {
+        "ladders": { "4":14, "9":31, "20":38, "28":84, "40":59, "51":67, "63":81, "71":91 },
+        "snakes":  { "17":7, "54":34, "62":19, "64":60, "87":24, "93":73, "95":75, "99":78 }
+      }
+    },
+    {
+      "id": "random-walk",
+      "name": "Random walk on {-5..5}",
+      "description": "Simple random walk on integers truncated to {-5,-4,...,4,5}. Reflecting boundaries: at ±5 you stay with prob 0.5.",
+      "states": ["-5","-4","-3","-2","-1","0","1","2","3","4","5"],
+      "matrix": null,
+      "generated": "random-walk-z"
+    },
+    {
+      "id": "birth-death",
+      "name": "Birth-death chain",
+      "description": "Population chain on {0,1,...,6}. State 0 is absorbing (extinction). Each step: birth with prob 0.6, death with prob 0.4 (except boundaries).",
+      "states": ["0","1","2","3","4","5","6"],
+      "matrix": null,
+      "generated": "birth-death"
+    },
+    {
+      "id": "cat-mouse",
+      "name": "Cat and mouse",
+      "description": "4-state predator-prey toy. States: both alive, cat only, mouse only, neither. Transitions model capture and escape probabilities.",
+      "states": ["Both alive", "Cat only", "Mouse only", "Neither"],
+      "matrix": [
+        [0.5, 0.3, 0.1, 0.1],
+        [0.0, 0.7, 0.0, 0.3],
+        [0.4, 0.0, 0.5, 0.1],
+        [0.0, 0.0, 0.0, 1.0]
+      ]
+    },
+    {
+      "id": "blank",
+      "name": "Blank (3 states)",
+      "description": "Start from scratch. Edit the transition matrix directly; rows re-normalize automatically.",
+      "states": ["S1", "S2", "S3"],
+      "matrix": [
+        [0.333, 0.333, 0.334],
+        [0.333, 0.333, 0.334],
+        [0.333, 0.333, 0.334]
+      ]
+    }
+  ]
+}

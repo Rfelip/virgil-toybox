@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markov Chain Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------------------------------------------ */
+    /* Reset & base                                                         */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f6f2e9;
+      --ink:       #2b2722;
+      --ink-mid:   #5a4e3c;
+      --ink-faint: #9a8c78;
+      --rule:      #d4c9b4;
+      --amber:     #b87c2a;
+      --amber-lt:  #e8c97a;
+      --amber-hl:  #f0e0b0;
+      --red-dk:    #8a3020;
+      --cream-dk:  #ede5d4;
+      --mono:      'IBM Plex Mono', monospace;
+      --serif:     'EB Garamond', Georgia, serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Layout skeleton                                                      */
+    /* ------------------------------------------------------------------ */
+    .shell {
+      display: grid;
+      grid-template-columns: 200px 1fr 240px;
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "head  head  head"
+        "side  main  stats";
+      min-height: 100vh;
+    }
+
+    /* ---- Header ---- */
+    .masthead {
+      grid-area: head;
+      border-bottom: 1.5px solid var(--ink);
+      padding: 14px 24px 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+    }
+    .masthead h1 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .masthead .sub {
+      font-style: italic;
+      color: var(--ink-mid);
+      font-size: 0.92rem;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      grid-area: side;
+      border-right: 1px solid var(--rule);
+      padding: 16px 14px;
+      overflow-y: auto;
+    }
+    .sidebar-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .example-btn {
+      display: block;
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      padding: 8px 6px;
+      cursor: pointer;
+      font-family: var(--serif);
+      font-size: 0.88rem;
+      color: var(--ink);
+      line-height: 1.3;
+      transition: background 0.1s;
+    }
+    .example-btn:hover { background: var(--amber-hl); }
+    .example-btn.active {
+      background: var(--cream-dk);
+      font-weight: 500;
+    }
+    .example-btn .ex-name { display: block; }
+    .example-btn .ex-desc {
+      font-size: 0.74rem;
+      color: var(--ink-faint);
+      display: block;
+      margin-top: 1px;
+      font-style: italic;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      grid-area: main;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .top-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--rule);
+      min-height: 360px;
+    }
+
+    .panel {
+      padding: 14px 16px;
+      overflow: hidden;
+    }
+    .panel + .panel {
+      border-left: 1px solid var(--rule);
+    }
+    .panel-title {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 10px;
+    }
+
+    /* ---- Graph panel ---- */
+    #graph-canvas {
+      width: 100%;
+      display: block;
+    }
+
+    /* ---- Matrix panel ---- */
+    .matrix-scroll {
+      overflow: auto;
+      max-height: 320px;
+    }
+    table.matrix-table {
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+    }
+    .matrix-table .col-label {
+      font-size: 0.68rem;
+      color: var(--ink-mid);
+      text-align: center;
+      padding: 2px 6px 5px;
+    }
+    .matrix-table .row-label {
+      font-size: 0.72rem;
+      color: var(--ink-mid);
+      padding: 4px 10px 4px 2px;
+      white-space: nowrap;
+    }
+    .matrix-table td.cell {
+      padding: 0;
+      position: relative;
+    }
+    .cell-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      cursor: pointer;
+      transition: outline 0.1s;
+      outline: 1px solid transparent;
+      font-size: 0.75rem;
+      color: var(--ink);
+    }
+    .cell-inner:hover { outline-color: var(--amber); }
+    .cell-inner.editing {
+      outline: 1.5px solid var(--amber);
+    }
+    .cell-inner input {
+      width: 44px;
+      background: none;
+      border: none;
+      outline: none;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--ink);
+    }
+    .matrix-tooltip {
+      position: fixed;
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 4px 8px;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+    }
+
+    /* ---- Walk panel ---- */
+    .walk-panel {
+      padding: 12px 16px 14px;
+      border-top: 1px solid var(--rule);
+    }
+    .walk-panel .panel-title { margin-bottom: 8px; }
+
+    .walk-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .btn {
+      background: none;
+      border: 1px solid var(--ink);
+      font-family: var(--serif);
+      font-size: 0.82rem;
+      padding: 3px 12px;
+      cursor: pointer;
+      color: var(--ink);
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    .btn:disabled:hover { background: none; color: var(--ink); }
+
+    .speed-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: var(--ink-mid);
+      margin-left: auto;
+    }
+    .speed-wrap input[type=range] {
+      width: 90px;
+      accent-color: var(--amber);
+    }
+
+    #walk-trace {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      min-height: 40px;
+      padding: 4px 0 6px;
+      scrollbar-width: thin;
+    }
+    .trace-chip {
+      flex-shrink: 0;
+      background: var(--cream-dk);
+      border: 1px solid var(--rule);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      white-space: nowrap;
+      color: var(--ink-mid);
+      transition: background 0.15s;
+    }
+    .trace-chip.current {
+      background: var(--amber);
+      color: var(--bg);
+      border-color: var(--amber);
+      font-weight: 500;
+    }
+    .trace-chip.recent {
+      background: var(--amber-hl);
+      border-color: var(--amber-lt);
+      color: var(--ink);
+    }
+
+    /* ---- Stats rail ---- */
+    .stats-rail {
+      grid-area: stats;
+      border-left: 1px solid var(--rule);
+      padding: 16px 14px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+    }
+    .stats-section {
+      margin-bottom: 18px;
+    }
+    .stats-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 3px 0;
+      border-bottom: 1px solid var(--rule);
+      gap: 6px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-name {
+      color: var(--ink-mid);
+      font-style: italic;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      max-width: 100px;
+      line-height: 1.2;
+    }
+    .stat-val {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      text-align: right;
+    }
+
+    .chain-props {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .prop-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border: 1px solid var(--rule);
+    }
+    .prop-pill.yes { border-color: var(--amber); color: var(--amber); }
+    .prop-pill.no  { border-color: var(--rule);  color: var(--ink-faint); }
+    .prop-pill.na  { border-color: var(--rule);  color: var(--ink-faint); font-style: italic; }
+
+    .convergence-note {
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    /* Warning banner */
+    .chain-warning {
+      background: #f8f0e0;
+      border: 1px solid var(--amber);
+      padding: 6px 9px;
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .chain-warning.visible { display: block; }
+
+    /* Freq comparison bar */
+    .freq-bar-wrap {
+      margin: 3px 0;
+    }
+    .freq-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--ink-mid);
+      margin-bottom: 2px;
+    }
+    .freq-bar-track {
+      height: 6px;
+      background: var(--rule);
+      position: relative;
+    }
+    .freq-bar-theory {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: var(--amber-lt);
+    }
+    .freq-bar-empirical {
+      position: absolute;
+      top: 2px;
+      left: 0;
+      height: 2px;
+      background: var(--amber);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Responsive notes                                                     */
+    /* ------------------------------------------------------------------ */
+    @media (max-width: 980px) {
+      .shell {
+        grid-template-columns: 160px 1fr;
+        grid-template-areas:
+          "head  head"
+          "side  main"
+          "stats stats";
+      }
+      .stats-rail { border-left: none; border-top: 1px solid var(--rule); }
+      .top-panels { grid-template-columns: 1fr; }
+      .panel + .panel { border-left: none; border-top: 1px solid var(--rule); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- HEADER -->
+  <header class="masthead">
+    <h1>Markov Chain Visualizer</h1>
+    <span class="sub">state graph &middot; transition matrix &middot; sample walk &middot; stationary distribution</span>
+  </header>
+
+  <!-- SIDEBAR: example chooser -->
+  <nav class="sidebar" aria-label="Examples">
+    <div class="sidebar-label">examples</div>
+    <!-- populated by JS -->
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- Warning banner (non-irreducible, etc.) -->
+    <div class="chain-warning" id="chain-warning"></div>
+
+    <div class="top-panels">
+      <!-- State graph -->
+      <div class="panel" id="graph-panel">
+        <div class="panel-title">state graph</div>
+        <canvas id="graph-canvas"></canvas>
+      </div>
+
+      <!-- Transition matrix heatmap -->
+      <div class="panel" id="matrix-panel">
+        <div class="panel-title">transition matrix <span style="font-family:var(--mono);font-size:0.62rem;color:var(--ink-faint);letter-spacing:0">&mdash; click cell to edit, row re-normalizes</span></div>
+        <div class="matrix-scroll" id="matrix-container"></div>
+      </div>
+    </div>
+
+    <!-- Walk strip -->
+    <div class="walk-panel">
+      <div class="panel-title">sample walk</div>
+      <div class="walk-controls">
+        <button class="btn" id="btn-step">step</button>
+        <button class="btn" id="btn-step100">step 100</button>
+        <button class="btn" id="btn-play">play</button>
+        <button class="btn" id="btn-pause" disabled>pause</button>
+        <button class="btn" id="btn-reset">reset</button>
+        <div class="speed-wrap">
+          <span>speed</span>
+          <input type="range" id="speed-slider" min="1" max="10" value="5">
+          <span id="speed-label" style="font-family:var(--mono);font-size:0.7rem;">5</span>
+        </div>
+      </div>
+      <div id="walk-trace" aria-label="Walk trace"></div>
+    </div>
+
+  </div>
+
+  <!-- STATS RAIL -->
+  <aside class="stats-rail" aria-label="Statistics">
+
+    <div class="stats-section">
+      <div class="stats-label">chain properties</div>
+      <div class="chain-props" id="chain-props"></div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-label">stationary distribution</div>
+      <div id="stationary-container"></div>
+      <div class="convergence-note" id="convergence-note"></div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-label">mean recurrence time</div>
+      <div id="recurrence-container"></div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-label">empirical vs theoretical</div>
+      <div style="font-size:0.7rem;color:var(--ink-faint);margin-bottom:6px;font-style:italic;">
+        cream = stationary &pi;; amber bar = walk frequency
+      </div>
+      <div id="freq-container"></div>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- Hover tooltip for matrix cells -->
+<div class="matrix-tooltip" id="matrix-tooltip"></div>
+
+<script>
+// ============================================================
+// EXAMPLES — inline (examples.json is an optional override)
+// ============================================================
+const EXAMPLES_INLINE = [
+  {
+    id: "two-state",
+    name: "Two-state switch",
+    description: "Textbook intro.",
+    states: ["A", "B"],
+    matrix: [[0.7, 0.3],[0.4, 0.6]]
+  },
+  {
+    id: "weather",
+    name: "Weather (3-state)",
+    description: "Sunny/Cloudy/Rainy.",
+    states: ["Sunny", "Cloudy", "Rainy"],
+    matrix: [[0.7,0.2,0.1],[0.3,0.4,0.3],[0.2,0.4,0.4]]
+  },
+  {
+    id: "snakes-ladders",
+    name: "Snakes & Ladders",
+    description: "Board game chain.",
+    states: null, // generated
+    generated: "snakes-ladders"
+  },
+  {
+    id: "random-walk",
+    name: "Random walk {-5..5}",
+    description: "Reflecting boundaries.",
+    states: null,
+    generated: "random-walk-z"
+  },
+  {
+    id: "birth-death",
+    name: "Birth-death chain",
+    description: "Population {0..6}.",
+    states: null,
+    generated: "birth-death"
+  },
+  {
+    id: "cat-mouse",
+    name: "Cat and mouse",
+    description: "4-state predator-prey.",
+    states: ["Both alive","Cat only","Mouse only","Neither"],
+    matrix: [
+      [0.5,0.3,0.1,0.1],
+      [0.0,0.7,0.0,0.3],
+      [0.4,0.0,0.5,0.1],
+      [0.0,0.0,0.0,1.0]
+    ]
+  },
+  {
+    id: "blank",
+    name: "Blank (3 states)",
+    description: "Edit freely.",
+    states: ["S1","S2","S3"],
+    matrix: [[1/3,1/3,1/3],[1/3,1/3,1/3],[1/3,1/3,1/3]]
+  }
+];
+
+// ============================================================
+// GENERATORS: build P for special chains
+// ============================================================
+function generateSnakesLadders() {
+  const N = 101; // states 0..100
+  const ladders = {4:14,9:31,20:38,28:84,40:59,51:67,63:81,71:91};
+  const snakes  = {17:7,54:34,62:19,64:60,87:24,93:73,95:75,99:78};
+  function destination(sq) {
+    if (sq >= 100) return 100;
+    if (ladders[sq] !== undefined) return ladders[sq];
+    if (snakes[sq] !== undefined) return snakes[sq];
+    return sq;
+  }
+  const P = Array.from({length:N}, () => new Array(N).fill(0));
+  for (let s = 0; s <= 99; s++) {
+    for (let d = 1; d <= 6; d++) {
+      let land = s + d;
+      if (land > 100) land = 100; // overshoot stays at 100 in classic rules; simpler: bounce
+      const dest = destination(land);
+      P[s][dest] += 1/6;
+    }
+  }
+  P[100][100] = 1; // absorbing
+  const states = Array.from({length:N}, (_,i) => String(i));
+  return {states, matrix: P};
+}
+
+function generateRandomWalk() {
+  const labels = ["-5","-4","-3","-2","-1","0","1","2","3","4","5"];
+  const n = labels.length;
+  const P = Array.from({length:n}, () => new Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    if (i === 0)     { P[i][0] = 0.5; P[i][1] = 0.5; }
+    else if (i===n-1){ P[i][n-2]=0.5; P[i][n-1]=0.5; }
+    else             { P[i][i-1]=0.5; P[i][i+1]=0.5; }
+  }
+  return {states: labels, matrix: P};
+}
+
+function generateBirthDeath() {
+  const labels = ["0","1","2","3","4","5","6"];
+  const n = 7;
+  const b = 0.6, d = 0.4;
+  const P = Array.from({length:n}, () => new Array(n).fill(0));
+  P[0][0] = 1; // absorbing state
+  for (let i = 1; i < n-1; i++) {
+    P[i][i+1] = b;
+    P[i][i-1] = d;
+  }
+  P[n-1][n-1] = b;
+  P[n-1][n-2] = d;
+  return {states: labels, matrix: P};
+}
+
+function resolveExample(ex) {
+  if (ex.generated === "snakes-ladders") return generateSnakesLadders();
+  if (ex.generated === "random-walk-z")  return generateRandomWalk();
+  if (ex.generated === "birth-death")    return generateBirthDeath();
+  return {states: ex.states, matrix: ex.matrix};
+}
+
+// ============================================================
+// MATH: stationary distribution via power iteration
+// ============================================================
+function powerIteration(P) {
+  const n = P.length;
+  const TOL = 1e-9;
+  const MAX_ITER = 500;
+
+  // Check if row-stochastic and square
+  if (!P.every(row => row.length === n)) return {pi: null, iters: 0, converged: false};
+
+  // Start with uniform
+  let pi = new Array(n).fill(1/n);
+  let iters = 0;
+  let converged = false;
+
+  for (let k = 0; k < MAX_ITER; k++) {
+    // pi_{k+1} = pi_k * P  (left multiplication)
+    const next = new Array(n).fill(0);
+    for (let j = 0; j < n; j++) {
+      for (let i = 0; i < n; i++) {
+        next[j] += pi[i] * P[i][j];
+      }
+    }
+    // Normalize (guard against numerical drift)
+    const s = next.reduce((a,b) => a+b, 0);
+    for (let j = 0; j < n; j++) next[j] /= s;
+
+    // Check convergence
+    let diff = 0;
+    for (let j = 0; j < n; j++) diff += Math.abs(next[j] - pi[j]);
+    pi = next;
+    iters = k+1;
+    if (diff < TOL) { converged = true; break; }
+  }
+  return {pi, iters, converged};
+}
+
+// ============================================================
+// MATH: chain properties
+// ============================================================
+function checkIrreducible(P) {
+  // BFS reachability: is every state reachable from every other?
+  const n = P.length;
+  for (let start = 0; start < n; start++) {
+    const visited = new Array(n).fill(false);
+    const queue = [start];
+    visited[start] = true;
+    while (queue.length) {
+      const cur = queue.shift();
+      for (let j = 0; j < n; j++) {
+        if (P[cur][j] > 1e-12 && !visited[j]) {
+          visited[j] = true;
+          queue.push(j);
+        }
+      }
+    }
+    if (visited.some(v => !v)) return false;
+  }
+  return true;
+}
+
+function checkAperiodic(P) {
+  // A state is aperiodic if gcd of return times = 1.
+  // Sufficient condition: any state has P[i][i] > 0 and chain is irreducible
+  // For general check: compute period via BFS layer parity
+  const n = P.length;
+  for (let s = 0; s < n; s++) {
+    const dist = new Array(n).fill(-1);
+    dist[s] = 0;
+    const queue = [s];
+    let period = 0;
+    while (queue.length) {
+      const u = queue.shift();
+      for (let v = 0; v < n; v++) {
+        if (P[u][v] < 1e-12) continue;
+        if (dist[v] === -1) {
+          dist[v] = dist[u] + 1;
+          queue.push(v);
+        } else {
+          // Back/cross edge: contributes to period
+          const cycle = dist[u] + 1 - dist[v];
+          period = gcd(period, cycle);
+        }
+      }
+    }
+    if (period !== 1 && period !== 0) return false;
+  }
+  return true;
+}
+
+function gcd(a, b) { while(b){ [a,b]=[b,a%b]; } return a; }
+
+function sampleNext(P, state) {
+  const row = P[state];
+  const r = Math.random();
+  let cum = 0;
+  for (let j = 0; j < row.length; j++) {
+    cum += row[j];
+    if (r < cum) return j;
+  }
+  return row.length - 1;
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let chain = {
+  states: [],
+  P: [],
+  n: 0
+};
+
+let walk = {
+  history: [],
+  current: 0,
+  counts: []
+};
+
+let playInterval = null;
+let isPlaying = false;
+const TRACE_MAX = 60;
+
+// ============================================================
+// LOAD EXAMPLE
+// ============================================================
+function loadExample(ex) {
+  const resolved = resolveExample(ex);
+  chain.states = resolved.states;
+  chain.P = resolved.matrix.map(r => [...r]);
+  chain.n = chain.states.length;
+
+  // Reset walk
+  walk.history = [];
+  walk.current = 0;
+  walk.counts = new Array(chain.n).fill(0);
+  walk.counts[0]++;
+  walk.history.push(0);
+
+  stopPlay();
+  recomputeStats();
+  renderAll();
+}
+
+// ============================================================
+// NORMALIZE ROW
+// ============================================================
+function normalizeRow(i) {
+  const row = chain.P[i];
+  const s = row.reduce((a,b) => a+b, 0);
+  if (s < 1e-12) {
+    // reset to uniform if all zero
+    chain.P[i] = new Array(chain.n).fill(1/chain.n);
+  } else {
+    chain.P[i] = row.map(v => v/s);
+  }
+}
+
+// ============================================================
+// STATS
+// ============================================================
+let lastStats = {};
+
+function recomputeStats() {
+  const irreducible = checkIrreducible(chain.P);
+  const aperiodic   = irreducible ? checkAperiodic(chain.P) : false;
+  const ergodic     = irreducible && aperiodic;
+  const {pi, iters, converged} = powerIteration(chain.P);
+
+  // Mean recurrence time: m_i = 1/pi_i (only for irreducible chains)
+  const mrt = (irreducible && pi) ? pi.map(p => p > 1e-12 ? 1/p : Infinity) : null;
+
+  lastStats = {irreducible, aperiodic, ergodic, pi, iters, converged, mrt};
+
+  // Warning
+  const warn = document.getElementById('chain-warning');
+  if (!irreducible) {
+    warn.textContent = "This chain is not irreducible — some states are not reachable from others. The stationary distribution shown is for the distribution after power iteration from the uniform start; it may not be unique.";
+    warn.classList.add('visible');
+  } else {
+    warn.textContent = '';
+    warn.classList.remove('visible');
+  }
+
+  renderStats();
+}
+
+// ============================================================
+// RENDER: stats rail
+// ============================================================
+function renderStats() {
+  const {irreducible, aperiodic, ergodic, pi, iters, converged, mrt} = lastStats;
+
+  // Properties
+  const propsEl = document.getElementById('chain-props');
+  propsEl.innerHTML = '';
+  function pill(label, val) {
+    const d = document.createElement('div');
+    d.className = 'prop-pill ' + (val === null ? 'na' : val ? 'yes' : 'no');
+    d.textContent = (val === true ? '+' : val === false ? '-' : '?') + ' ' + label;
+    propsEl.appendChild(d);
+  }
+  pill('irreducible', irreducible);
+  pill('aperiodic', irreducible ? aperiodic : null);
+  pill('ergodic', irreducible ? ergodic : null);
+
+  // Stationary
+  const statEl = document.getElementById('stationary-container');
+  statEl.innerHTML = '';
+  if (pi) {
+    chain.states.forEach((s, i) => {
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      row.innerHTML = `<span class="stat-name">${escHtml(s)}</span><span class="stat-val">${(pi[i]*100).toFixed(2)}%</span>`;
+      statEl.appendChild(row);
+    });
+  } else {
+    statEl.textContent = 'n/a';
+  }
+  const cnote = document.getElementById('convergence-note');
+  if (pi) {
+    cnote.textContent = converged
+      ? `converged in ${iters} iterations`
+      : `did not converge (${iters} iter)`;
+  } else {
+    cnote.textContent = '';
+  }
+
+  // Recurrence
+  const recEl = document.getElementById('recurrence-container');
+  recEl.innerHTML = '';
+  if (mrt && irreducible) {
+    chain.states.forEach((s, i) => {
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      const v = mrt[i] === Infinity ? '&infin;' : mrt[i].toFixed(2);
+      row.innerHTML = `<span class="stat-name">${escHtml(s)}</span><span class="stat-val">${v}</span>`;
+      recEl.appendChild(row);
+    });
+  } else {
+    recEl.innerHTML = '<span style="font-style:italic;color:var(--ink-faint);font-size:0.78rem;">only defined for irreducible chains</span>';
+  }
+
+  renderFreqBars();
+}
+
+function renderFreqBars() {
+  const {pi} = lastStats;
+  const freqEl = document.getElementById('freq-container');
+  freqEl.innerHTML = '';
+  if (!pi) return;
+
+  const total = walk.counts.reduce((a,b)=>a+b,0);
+  chain.states.forEach((s, i) => {
+    const theoryFrac = pi[i];
+    const empirFrac  = total > 0 ? walk.counts[i]/total : 0;
+    const wrap = document.createElement('div');
+    wrap.className = 'freq-bar-wrap';
+    wrap.innerHTML = `
+      <div class="freq-label">
+        <span>${escHtml(s)}</span>
+        <span style="font-family:var(--mono)">${(empirFrac*100).toFixed(1)}% / ${(theoryFrac*100).toFixed(1)}%</span>
+      </div>
+      <div class="freq-bar-track">
+        <div class="freq-bar-theory" style="width:${(theoryFrac*100).toFixed(1)}%"></div>
+        <div class="freq-bar-empirical" style="width:${(empirFrac*100).toFixed(1)}%"></div>
+      </div>`;
+    freqEl.appendChild(wrap);
+  });
+}
+
+// ============================================================
+// RENDER: transition matrix
+// ============================================================
+function renderMatrix() {
+  const container = document.getElementById('matrix-container');
+  container.innerHTML = '';
+
+  if (chain.n > 20) {
+    container.innerHTML = `<p style="font-style:italic;color:var(--ink-faint);font-size:0.8rem;">Matrix too large to display (${chain.n} states). Showing graph only.</p>`;
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'matrix-table';
+
+  // Header row with column labels
+  const thead = document.createElement('tr');
+  const cornerTh = document.createElement('th');
+  cornerTh.style.padding = '0';
+  thead.appendChild(cornerTh);
+  chain.states.forEach(s => {
+    const th = document.createElement('th');
+    th.className = 'col-label';
+    th.textContent = truncLabel(s, 6);
+    thead.appendChild(th);
+  });
+  table.appendChild(thead);
+
+  // Data rows
+  chain.P.forEach((row, i) => {
+    const tr = document.createElement('tr');
+    const rowLabel = document.createElement('td');
+    rowLabel.className = 'row-label';
+    rowLabel.textContent = truncLabel(chain.states[i], 8);
+    tr.appendChild(rowLabel);
+
+    row.forEach((val, j) => {
+      const td = document.createElement('td');
+      td.className = 'cell';
+      const inner = document.createElement('div');
+      inner.className = 'cell-inner';
+      inner.style.background = probColor(val);
+      inner.textContent = val.toFixed(3);
+      inner.dataset.i = i;
+      inner.dataset.j = j;
+
+      // Hover tooltip
+      inner.addEventListener('mouseenter', (e) => {
+        const tip = document.getElementById('matrix-tooltip');
+        tip.textContent = `P(${chain.states[i]} → ${chain.states[j]}) = ${val.toFixed(6)}`;
+        tip.style.display = 'block';
+      });
+      inner.addEventListener('mousemove', (e) => {
+        const tip = document.getElementById('matrix-tooltip');
+        tip.style.left = (e.clientX + 12) + 'px';
+        tip.style.top  = (e.clientY - 6)  + 'px';
+      });
+      inner.addEventListener('mouseleave', () => {
+        document.getElementById('matrix-tooltip').style.display = 'none';
+      });
+
+      // Click to edit
+      inner.addEventListener('click', () => startCellEdit(inner, i, j));
+
+      td.appendChild(inner);
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  container.appendChild(table);
+}
+
+function startCellEdit(inner, i, j) {
+  if (inner.querySelector('input')) return; // already editing
+  inner.classList.add('editing');
+  const old = inner.textContent;
+  inner.textContent = '';
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = chain.P[i][j].toFixed(4);
+  inp.select();
+  inner.appendChild(inp);
+  inp.focus();
+
+  function commit() {
+    const v = parseFloat(inp.value);
+    inner.classList.remove('editing');
+    if (!isNaN(v) && v >= 0) {
+      chain.P[i][j] = v;
+      normalizeRow(i);
+    }
+    recomputeStats();
+    renderAll();
+  }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { commit(); }
+    if (e.key === 'Escape') {
+      inner.classList.remove('editing');
+      inner.textContent = old;
+    }
+  });
+}
+
+function probColor(v) {
+  // cream (#f6f2e9) → amber (#b87c2a)
+  const t = Math.min(1, Math.max(0, v));
+  const r = Math.round(246 + t*(184-246));
+  const g = Math.round(242 + t*(124-242));
+  const b = Math.round(233 + t*(42-233));
+  return `rgb(${r},${g},${b})`;
+}
+
+// ============================================================
+// RENDER: state graph (canvas)
+// ============================================================
+function renderGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  const panel  = document.getElementById('graph-panel');
+  const W = panel.clientWidth - 32;
+  const H = Math.max(260, W * 0.72);
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const n = chain.n;
+  if (n === 0) return;
+
+  const MAX_NODES_FULL = 30; // above this, skip drawing edges for clarity
+
+  // Layout: circle arrangement, or grid for large chains
+  const positions = layoutNodes(n, W, H);
+
+  const nodeR = Math.max(14, Math.min(28, Math.floor(W / (n * 1.5 + 2))));
+
+  // Draw edges first
+  const THRESHOLD = 1e-4; // don't draw near-zero edges
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const p = chain.P[i][j];
+      if (p < THRESHOLD) continue;
+      if (n > MAX_NODES_FULL && p < 0.05) continue; // reduce clutter for large chains
+      drawEdge(ctx, positions, i, j, p, nodeR, n);
+    }
+  }
+
+  // Draw nodes
+  for (let i = 0; i < n; i++) {
+    const {x, y} = positions[i];
+    const isCurrent = (walk.history.length > 0 && walk.history[walk.history.length-1] === i);
+
+    ctx.beginPath();
+    ctx.arc(x, y, nodeR, 0, 2*Math.PI);
+    if (isCurrent) {
+      ctx.fillStyle = '#b87c2a';
+    } else {
+      ctx.fillStyle = '#ede5d4';
+    }
+    ctx.fill();
+    ctx.strokeStyle = isCurrent ? '#7a4f10' : '#5a4e3c';
+    ctx.lineWidth = isCurrent ? 2 : 1;
+    ctx.stroke();
+
+    // Label
+    ctx.fillStyle = isCurrent ? '#f6f2e9' : '#2b2722';
+    ctx.font = `${nodeR > 20 ? 13 : 10}px 'EB Garamond', serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const label = truncLabel(chain.states[i], nodeR > 20 ? 5 : 3);
+    ctx.fillText(label, x, y);
+  }
+}
+
+function layoutNodes(n, W, H) {
+  if (n <= 12) {
+    // Circle layout
+    const cx = W/2, cy = H/2;
+    const r  = Math.min(W, H) * 0.36;
+    return Array.from({length:n}, (_,i) => {
+      const angle = (2*Math.PI*i/n) - Math.PI/2;
+      return {x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle)};
+    });
+  } else {
+    // Grid layout
+    const cols = Math.ceil(Math.sqrt(n));
+    const rows = Math.ceil(n/cols);
+    const padX = W * 0.08, padY = H * 0.08;
+    const stepX = (W - 2*padX) / (cols - 1 || 1);
+    const stepY = (H - 2*padY) / (rows - 1 || 1);
+    return Array.from({length:n}, (_,i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      return {x: padX + col*stepX, y: padY + row*stepY};
+    });
+  }
+}
+
+function drawEdge(ctx, positions, i, j, p, nodeR, n) {
+  const from = positions[i];
+  const to   = positions[j];
+
+  // Self-loop
+  if (i === j) {
+    const lx = from.x + nodeR * 1.1;
+    const ly = from.y - nodeR * 1.1;
+    ctx.beginPath();
+    ctx.arc(lx, ly, nodeR * 0.65, 0, 2*Math.PI);
+    ctx.strokeStyle = edgeColor(p);
+    ctx.lineWidth = edgeWidth(p);
+    ctx.stroke();
+    return;
+  }
+
+  // Check if reverse edge exists for offset
+  const rev = chain.P[j][i];
+  const hasBoth = rev > 1e-4;
+  const OFFSET = hasBoth ? 5 : 0;
+
+  // Direction vector
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  if (dist < 1) return;
+  const ux = dx/dist, uy = dy/dist;
+  // Perpendicular
+  const px_ = -uy, py_ = ux;
+
+  const sx = from.x + ux*nodeR + px_*OFFSET;
+  const sy = from.y + uy*nodeR + py_*OFFSET;
+  const ex = to.x   - ux*nodeR + px_*OFFSET;
+  const ey = to.y   - uy*nodeR + py_*OFFSET;
+
+  // Draw line
+  ctx.beginPath();
+  ctx.moveTo(sx, sy);
+  ctx.lineTo(ex, ey);
+  ctx.strokeStyle = edgeColor(p);
+  ctx.lineWidth = edgeWidth(p);
+  ctx.stroke();
+
+  // Arrowhead
+  const angle = Math.atan2(ey-sy, ex-sx);
+  const arrLen = Math.max(7, Math.min(12, p*25 + 5));
+  const arrWid = 0.38;
+  ctx.beginPath();
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(ex - arrLen*Math.cos(angle-arrWid), ey - arrLen*Math.sin(angle-arrWid));
+  ctx.lineTo(ex - arrLen*Math.cos(angle+arrWid), ey - arrLen*Math.sin(angle+arrWid));
+  ctx.closePath();
+  ctx.fillStyle = edgeColor(p);
+  ctx.fill();
+
+  // Probability label (only if not too many nodes and edge is significant)
+  if (n <= 8 && p > 0.05) {
+    const mx = (sx+ex)/2 + px_*8;
+    const my = (sy+ey)/2 + py_*8;
+    ctx.fillStyle = '#5a4e3c';
+    ctx.font = "9px 'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(p.toFixed(2), mx, my);
+  }
+}
+
+function edgeColor(p) {
+  // faint for low prob, dark amber for high
+  const t = Math.min(1, p * 2);
+  const r = Math.round(160 + t*(90-160));
+  const g = Math.round(145 + t*(65-145));
+  const b = Math.round(120 + t*(20-120));
+  return `rgba(${r},${g},${b},${0.3 + t*0.6})`;
+}
+function edgeWidth(p) { return Math.max(0.6, Math.min(3, p * 5)); }
+
+// ============================================================
+// RENDER: walk trace
+// ============================================================
+function renderTrace() {
+  const traceEl = document.getElementById('walk-trace');
+  traceEl.innerHTML = '';
+  const h = walk.history;
+  const show = h.slice(Math.max(0, h.length - TRACE_MAX));
+  show.forEach((stateIdx, k) => {
+    const chip = document.createElement('div');
+    chip.className = 'trace-chip';
+    const isLast = (k === show.length - 1);
+    const isRecent = (k >= show.length - 4);
+    if (isLast) chip.classList.add('current');
+    else if (isRecent) chip.classList.add('recent');
+    chip.textContent = truncLabel(chain.states[stateIdx], 8);
+    traceEl.appendChild(chip);
+  });
+  // Scroll to end
+  traceEl.scrollLeft = traceEl.scrollWidth;
+}
+
+// ============================================================
+// RENDER ALL
+// ============================================================
+function renderAll() {
+  renderGraph();
+  renderMatrix();
+  renderTrace();
+  renderFreqBars();
+}
+
+// ============================================================
+// WALK CONTROLS
+// ============================================================
+function doStep(n = 1) {
+  for (let k = 0; k < n; k++) {
+    const cur = walk.history[walk.history.length - 1];
+    const next = sampleNext(chain.P, cur);
+    walk.history.push(next);
+    walk.counts[next]++;
+  }
+  if (walk.history.length > 2000) {
+    walk.history = walk.history.slice(walk.history.length - 2000);
+  }
+  renderAll();
+}
+
+function stopPlay() {
+  if (playInterval) { clearInterval(playInterval); playInterval = null; }
+  isPlaying = false;
+  document.getElementById('btn-play').disabled  = false;
+  document.getElementById('btn-pause').disabled = true;
+}
+
+function startPlay() {
+  if (isPlaying) return;
+  isPlaying = true;
+  document.getElementById('btn-play').disabled  = true;
+  document.getElementById('btn-pause').disabled = false;
+  const speed = parseInt(document.getElementById('speed-slider').value, 10);
+  const delay = Math.round(1200 / speed);
+  playInterval = setInterval(() => doStep(1), delay);
+}
+
+function resetWalk() {
+  stopPlay();
+  walk.history = [0];
+  walk.counts  = new Array(chain.n).fill(0);
+  walk.counts[0] = 1;
+  renderAll();
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function buildSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  // Keep the label
+  const label = sidebar.querySelector('.sidebar-label');
+  sidebar.innerHTML = '';
+  sidebar.appendChild(label);
+
+  EXAMPLES_INLINE.forEach((ex, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'example-btn';
+    btn.dataset.idx = idx;
+    btn.innerHTML = `<span class="ex-name">${escHtml(ex.name)}</span><span class="ex-desc">${escHtml(ex.description)}</span>`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.example-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadExample(ex);
+    });
+    sidebar.appendChild(btn);
+  });
+}
+
+// ============================================================
+// CONTROLS: event listeners
+// ============================================================
+document.getElementById('btn-step').addEventListener('click', () => doStep(1));
+document.getElementById('btn-step100').addEventListener('click', () => doStep(100));
+document.getElementById('btn-play').addEventListener('click', () => startPlay());
+document.getElementById('btn-pause').addEventListener('click', () => stopPlay());
+document.getElementById('btn-reset').addEventListener('click', () => resetWalk());
+
+document.getElementById('speed-slider').addEventListener('input', function() {
+  document.getElementById('speed-label').textContent = this.value;
+  if (isPlaying) {
+    stopPlay();
+    startPlay();
+  }
+});
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function truncLabel(s, maxLen) {
+  if (s.length <= maxLen) return s;
+  return s.slice(0, maxLen - 1) + '…';
+}
+
+// ============================================================
+// RESIZE
+// ============================================================
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => renderGraph(), 120);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+buildSidebar();
+// Activate first example
+const firstBtn = document.querySelector('.example-btn');
+if (firstBtn) {
+  firstBtn.classList.add('active');
+  loadExample(EXAMPLES_INLINE[0]);
+}
+</script>
+</body>
+</html>

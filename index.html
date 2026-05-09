@@ -117,6 +117,64 @@
 
       <div class="card-grid">
 
+        <a class="toy-card" href="toys/2026-05-09-markov-visualizer/">
+          <div class="toy-card-art" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="14" width="88" height="72" fill="#f6f2e9" stroke="#2a2419" stroke-width="0.8" />
+              <!-- Three state circles -->
+              <circle cx="50" cy="32" r="9" fill="#ede5d4" stroke="#5a4e3c" stroke-width="0.8"/>
+              <text x="50" y="32" text-anchor="middle" dominant-baseline="central"
+                font-family="'EB Garamond', Georgia, serif" font-size="6" fill="#2b2722">S</text>
+              <circle cx="28" cy="68" r="9" fill="#b87c2a" stroke="#7a4f10" stroke-width="1.2"/>
+              <text x="28" y="68" text-anchor="middle" dominant-baseline="central"
+                font-family="'EB Garamond', Georgia, serif" font-size="6" fill="#f6f2e9">C</text>
+              <circle cx="72" cy="68" r="9" fill="#ede5d4" stroke="#5a4e3c" stroke-width="0.8"/>
+              <text x="72" y="68" text-anchor="middle" dominant-baseline="central"
+                font-family="'EB Garamond', Georgia, serif" font-size="6" fill="#2b2722">R</text>
+              <!-- Edges -->
+              <line x1="43" y1="38" x2="34" y2="60" stroke="#9a8c78" stroke-width="0.8"/>
+              <line x1="57" y1="38" x2="65" y2="60" stroke="#9a8c78" stroke-width="0.8"/>
+              <line x1="37" y1="68" x2="63" y2="68" stroke="#b87c2a" stroke-width="1.2"/>
+              <!-- Arrowheads -->
+              <polygon points="34,60 31,54 38,55" fill="#9a8c78"/>
+              <polygon points="65,60 62,54 69,55" fill="#9a8c78"/>
+              <polygon points="63,68 57,65 57,71" fill="#b87c2a"/>
+              <!-- Tiny probability labels -->
+              <text x="34" y="48" font-family="'IBM Plex Mono',monospace" font-size="3.5" fill="#7a6e5a">0.3</text>
+              <text x="60" y="48" font-family="'IBM Plex Mono',monospace" font-size="3.5" fill="#7a6e5a">0.2</text>
+              <text x="47" y="65" font-family="'IBM Plex Mono',monospace" font-size="3.5" fill="#b87c2a">0.4</text>
+              <!-- Matrix snippet bottom right -->
+              <rect x="72" y="22" width="20" height="14" fill="rgba(232,201,122,0.2)" stroke="#d4c9b4" stroke-width="0.5"/>
+              <text x="74" y="27" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">0.7 0.2</text>
+              <text x="74" y="31" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">0.3 0.4</text>
+              <text x="74" y="35" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">0.2 0.4</text>
+              <!-- Walk tape at bottom -->
+              <rect x="8" y="82" width="10" height="5" fill="#ede5d4" stroke="#d4c9b4" stroke-width="0.4"/>
+              <text x="13" y="86" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">S</text>
+              <rect x="20" y="82" width="10" height="5" fill="#ede5d4" stroke="#d4c9b4" stroke-width="0.4"/>
+              <text x="25" y="86" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">C</text>
+              <rect x="32" y="82" width="10" height="5" fill="#ede5d4" stroke="#d4c9b4" stroke-width="0.4"/>
+              <text x="37" y="86" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#5a4e3c">C</text>
+              <rect x="44" y="82" width="10" height="5" fill="#b87c2a" stroke="#7a4f10" stroke-width="0.5"/>
+              <text x="49" y="86" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="3" fill="#f6f2e9">R</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Markov Chain Visualizer</h3>
+            <p class="card-sub">state graph, matrix, walk, stationary distribution</p>
+            <p class="card-blurb">
+              Three coupled views of a Markov chain: a directed state graph with
+              probability-weighted arrows, an editable transition matrix heatmap
+              (click any cell to change it; the row re-normalizes), and an animated
+              sample walk. Stats rail shows stationary distribution via power
+              iteration, mean recurrence times, and irreducibility&thinsp;/&thinsp;ergodicity flags.
+              Seven pre-loaded examples from the textbook two-state switch to Snakes
+              &amp; Ladders.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <a class="toy-card" href="toys/2026-05-09-bichromator-concrete/">
           <div class="toy-card-art" aria-hidden="true">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
