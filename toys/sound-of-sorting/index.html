@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sound of Sorting — The Night Gazette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -27,7 +30,7 @@
 
   body {
     padding: 32px 40px 60px;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     background:
       radial-gradient(circle at 25% 15%, rgba(255,255,255,0.5), transparent 60%),
@@ -74,38 +77,140 @@
     color: var(--ink);
   }
 
+  /* ─── Main layout ─── */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    border: 1px solid var(--rule);
+    background: rgba(255, 252, 240, 0.7);
+  }
+
+  .sidebar-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .algo-list {
+    list-style: none;
+    padding: 4px 0;
+  }
+
+  .algo-list li {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.2;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+    color: var(--ink-soft);
+  }
+
+  .algo-list li:hover {
+    background: rgba(200, 154, 58, 0.1);
+    color: var(--ink);
+  }
+
+  .algo-list li.active {
+    border-left-color: var(--accent-amber);
+    color: var(--ink);
+    background: rgba(200, 154, 58, 0.12);
+    font-weight: 500;
+  }
+
+  .algo-list li .complexity {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-top: 1px;
+    opacity: 0.7;
+  }
+
+  .algo-list li.active .complexity {
+    opacity: 1;
+  }
+
+  /* ─── Right column ─── */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
   /* ─── Canvas ─── */
   .stage {
     position: relative;
     background: #fbf6e9;
     border: 1px solid var(--rule);
     box-shadow: inset 0 0 30px rgba(0,0,0,0.04);
-    margin-bottom: 18px;
   }
 
   canvas {
     display: block;
     width: 100%;
-    height: 380px;
+    height: 340px;
+  }
+
+  /* ─── Now playing strip ─── */
+  .now-playing {
+    padding: 10px 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    background: rgba(251, 246, 233, 0.9);
+  }
+
+  .now-playing-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .now-playing-complexity {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--accent-amber);
+  }
+
+  .now-playing-note {
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    flex: 1;
+    text-align: right;
   }
 
   /* ─── Controls ─── */
   .controls {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto auto auto;
+    grid-template-columns: repeat(3, 1fr) auto auto auto auto;
     gap: 14px 18px;
     align-items: end;
-    padding: 18px 20px;
+    padding: 16px 18px;
     background: rgba(255, 252, 240, 0.7);
     border: 1px solid var(--rule);
-    margin-bottom: 14px;
   }
 
   .control {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    min-width: 100px;
+    min-width: 80px;
   }
 
   .control label {
@@ -132,14 +237,16 @@
 
   button {
     font-family: 'EB Garamond', serif;
-    font-size: 16px;
-    padding: 8px 16px;
+    font-size: 15px;
+    padding: 7px 14px;
     background: var(--ink);
     color: var(--paper);
     border: none;
     cursor: pointer;
     letter-spacing: 0.04em;
     transition: background 0.15s;
+    white-space: nowrap;
+    align-self: end;
   }
 
   button:hover { background: var(--accent-red); }
@@ -156,12 +263,27 @@
     color: var(--paper);
   }
 
+  button.mute-btn {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  button.mute-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
   /* ─── Stats ─── */
   .meter {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 18px;
-    padding: 12px 20px;
+    padding: 10px 18px;
     background: rgba(255, 252, 240, 0.5);
     border: 1px solid var(--rule);
     font-family: 'IBM Plex Mono', 'Menlo', monospace;
@@ -174,11 +296,11 @@
   /* ─── Algorithm notes ─── */
   .notes {
     margin-top: 26px;
-    columns: 2;
-    column-gap: 36px;
+    columns: 3;
+    column-gap: 30px;
     column-rule: 1px solid var(--rule);
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 13.5px;
+    line-height: 1.5;
     color: var(--ink-soft);
   }
 
@@ -186,9 +308,10 @@
     font-style: italic;
     font-weight: 500;
     color: var(--ink);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     margin-top: 8px;
     break-after: avoid;
+    font-size: 14.5px;
   }
 
   .notes h3:first-child { margin-top: 0; }
@@ -204,14 +327,18 @@
     color: var(--ink-soft);
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     body { padding: 20px 16px; }
     h1 { font-size: 28px; }
     header { grid-template-columns: 1fr; }
     .masthead { text-align: left; }
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
     .controls { grid-template-columns: 1fr 1fr; }
     .meter { grid-template-columns: 1fr 1fr; }
     .notes { columns: 1; }
+    .now-playing { flex-direction: column; gap: 4px; }
+    .now-playing-note { text-align: left; }
   }
 </style>
 </head>
@@ -219,71 +346,114 @@
   <header>
     <div>
       <h1>Sound of Sorting</h1>
-      <div class="tagline">Five algorithms, made audible. Each has its own song.</div>
+      <div class="tagline">Nine algorithms, made audible. Each has its own song.</div>
     </div>
     <div class="masthead">
       <div>The <em>Night Gazette</em></div>
       <div>Vol. I — Toybox No. 12</div>
-      <div>2026-04-16 · V</div>
+      <div>2026-05-09 · V</div>
     </div>
   </header>
 
-  <div class="stage">
-    <canvas id="canvas"></canvas>
-  </div>
+  <div class="main-layout">
+    <!-- Sidebar: algorithm list -->
+    <aside class="sidebar">
+      <div class="sidebar-header">Algorithm</div>
+      <ul class="algo-list" id="algo-list">
+        <li data-algo="bubble" class="active">
+          Bubble Sort
+          <span class="complexity">O(n²)</span>
+        </li>
+        <li data-algo="insertion">
+          Insertion Sort
+          <span class="complexity">O(n²)</span>
+        </li>
+        <li data-algo="selection">
+          Selection Sort
+          <span class="complexity">O(n²)</span>
+        </li>
+        <li data-algo="cocktail">
+          Cocktail Shaker
+          <span class="complexity">O(n²)</span>
+        </li>
+        <li data-algo="quick">
+          Quicksort
+          <span class="complexity">O(n log n) avg</span>
+        </li>
+        <li data-algo="merge">
+          Merge Sort
+          <span class="complexity">O(n log n)</span>
+        </li>
+        <li data-algo="radix">
+          Radix Sort
+          <span class="complexity">O(nk)</span>
+        </li>
+        <li data-algo="pancake">
+          Pancake Sort
+          <span class="complexity">O(n²)</span>
+        </li>
+        <li data-algo="stooge">
+          Stooge Sort
+          <span class="complexity">O(n^2.71)</span>
+        </li>
+      </ul>
+    </aside>
 
-  <div class="controls">
-    <div class="control">
-      <label for="algo">Algorithm</label>
-      <select id="algo">
-        <option value="bubble">Bubble Sort</option>
-        <option value="insertion" selected>Insertion Sort</option>
-        <option value="selection">Selection Sort</option>
-        <option value="quick">Quicksort</option>
-        <option value="merge">Merge Sort</option>
-      </select>
+    <!-- Right: canvas + controls -->
+    <div class="right-col">
+      <div class="stage">
+        <canvas id="canvas"></canvas>
+        <div class="now-playing">
+          <span class="now-playing-name" id="np-name">Bubble Sort</span>
+          <span class="now-playing-complexity" id="np-complexity">O(n²)</span>
+          <span class="now-playing-note" id="np-note">Swap adjacent pairs, sweep after sweep. Sound: slow ascending wash.</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control">
+          <label for="size">Elements</label>
+          <select id="size">
+            <option value="16">16</option>
+            <option value="32">32</option>
+            <option value="64" selected>64</option>
+            <option value="128">128</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="shape">Dataset</label>
+          <select id="shape">
+            <option value="random" selected>Random</option>
+            <option value="sorted">Sorted</option>
+            <option value="reverse">Reverse</option>
+            <option value="few">Few uniques</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="speed">Speed: <span id="speed-val">120</span> ops/s</label>
+          <input type="range" id="speed" min="5" max="500" value="120">
+        </div>
+
+        <div class="control">
+          <label for="volume">Volume: <span id="volume-val">35</span></label>
+          <input type="range" id="volume" min="0" max="100" value="35">
+        </div>
+
+        <button id="run">Run</button>
+        <button class="secondary" id="step">Step</button>
+        <button class="secondary" id="reset">Reset</button>
+        <button class="mute-btn" id="mute-btn">Mute</button>
+      </div>
+
+      <div class="meter">
+        <div><span>Comparisons:</span> <b id="comparisons">0</b></div>
+        <div><span>Writes:</span> <b id="writes">0</b></div>
+        <div><span>Elapsed:</span> <b id="elapsed">0.00s</b></div>
+        <div><span>Status:</span> <b id="status">idle</b></div>
+      </div>
     </div>
-
-    <div class="control">
-      <label for="size">Elements</label>
-      <select id="size">
-        <option value="16">16</option>
-        <option value="32">32</option>
-        <option value="64" selected>64</option>
-        <option value="128">128</option>
-      </select>
-    </div>
-
-    <div class="control">
-      <label for="shape">Dataset</label>
-      <select id="shape">
-        <option value="random" selected>Random</option>
-        <option value="sorted">Sorted</option>
-        <option value="reverse">Reverse</option>
-        <option value="few">Few uniques</option>
-      </select>
-    </div>
-
-    <div class="control">
-      <label for="speed">Speed (ops/sec): <span id="speed-val">120</span></label>
-      <input type="range" id="speed" min="5" max="500" value="120">
-    </div>
-
-    <div class="control">
-      <label for="volume">Volume: <span id="volume-val">35</span></label>
-      <input type="range" id="volume" min="0" max="100" value="35">
-    </div>
-
-    <button id="run">▶  Run</button>
-    <button class="secondary" id="step">Step</button>
-    <button class="secondary" id="reset">Reset</button>
-  </div>
-
-  <div class="meter">
-    <div><span>Comparisons:</span> <b id="comparisons">0</b></div>
-    <div><span>Writes:</span> <b id="writes">0</b></div>
-    <div><span>Elapsed:</span> <b id="elapsed">0.00s</b></div>
-    <div><span>Status:</span> <b id="status">idle</b></div>
   </div>
 
   <section class="notes">
@@ -291,31 +461,57 @@
     <p>Swap adjacent out-of-order pairs, sweep after sweep. The sound is a slow ascending wash; the largest values bubble to the top one pass at a time, and you hear that ascent as a rising drone.</p>
 
     <h3>Insertion Sort — O(n²)</h3>
-    <p>Slide each new element back into its place in the sorted prefix. Like sorting a hand of cards. The song is gentle and patient, with little ratchets backwards.</p>
+    <p>Slide each new element back into its place in the sorted prefix. Like sorting a hand of cards. The song is gentle and patient, with small ratchets backwards.</p>
 
     <h3>Selection Sort — O(n²)</h3>
-    <p>Scan, find the minimum, swap it to the front. Repeat. The most architectural of the slow sorts — long quiet sweeps punctuated by single decisive thuds.</p>
+    <p>Scan, find the minimum, swap it to the front. The most architectural of the slow sorts — long quiet sweeps punctuated by single decisive thuds.</p>
+
+    <h3>Cocktail Shaker — O(n²)</h3>
+    <p>Bubble sort running both directions on alternate passes. The sound rocks back and forth, shrinking inward from both ends — a pendulum gradually settling to stillness.</p>
 
     <h3>Quicksort — O(n log n) avg</h3>
     <p>Pick a pivot, partition around it, recurse. The most chaotic song: bursts of partitioning at different scales overlap into something like sparse jazz.</p>
 
     <h3>Merge Sort — O(n log n)</h3>
-    <p>Divide, recursively sort, merge back. The merges are the music — long, even cascades. The most orchestral of the algorithms.</p>
+    <p>Divide, recursively sort, merge back. The merges are the music — long, even cascades. The most orchestral of the nine.</p>
+
+    <h3>Radix Sort — O(nk)</h3>
+    <p>Sort by individual digits (LSD). Each pass is a sweeping wave, bucketing by the current digit. The sound is regular, cyclical, almost mechanical — sorting without comparison.</p>
+
+    <h3>Pancake Sort — O(n²)</h3>
+    <p>Reverse prefixes to flip the maximum into place, then flip it to its final position. Theatrical: you hear the whole stack fold and unfold with each theatrical reversal.</p>
+
+    <h3>Stooge Sort — O(n^2.71)</h3>
+    <p>Dijkstra's comedically slow algorithm: sort the first two-thirds, then the last two-thirds, then the first two-thirds again. Recursive, lumbering, and oddly meditative.</p>
   </section>
 
   <footer>
-    Built one night by Virgil. Press <b>M</b> to mute. Source code lives in the toybox.
+    Built by Virgil. Press <b>M</b> to mute, <b>Space</b> to run/pause, <b>R</b> to reset, <b>S</b> to step. Pentatonic scale.
   </footer>
 
 <script>
 (() => {
   'use strict';
 
+  // ─── Algorithm metadata ───────────────────────────────────────────────
+  const ALGO_META = {
+    bubble:    { name: 'Bubble Sort',    complexity: 'O(n²)',          note: 'Swap adjacent pairs, sweep after sweep. Sound: slow ascending wash.' },
+    insertion: { name: 'Insertion Sort', complexity: 'O(n²)',          note: 'Slide each element back into the sorted prefix. Gentle ratchets.' },
+    selection: { name: 'Selection Sort', complexity: 'O(n²)',          note: 'Scan for the minimum, place it. Long sweeps, decisive thuds.' },
+    cocktail:  { name: 'Cocktail Shaker', complexity: 'O(n²)',         note: 'Bidirectional bubble sort. Sound pendulums back and forth.' },
+    quick:     { name: 'Quicksort',      complexity: 'O(n log n) avg', note: 'Partition around a pivot, recurse. Sparse jazz at multiple scales.' },
+    merge:     { name: 'Merge Sort',     complexity: 'O(n log n)',     note: 'Divide, sort halves, merge back. Long even cascades — the orchestral one.' },
+    radix:     { name: 'Radix Sort',     complexity: 'O(nk)',          note: 'Sort digit by digit (LSD). Regular sweeping waves — no comparisons.' },
+    pancake:   { name: 'Pancake Sort',   complexity: 'O(n²)',          note: 'Flip prefixes to place the maximum. Theatrical folding and unfolding.' },
+    stooge:    { name: 'Stooge Sort',    complexity: 'O(n^2.71)',      note: 'Sort 2/3, then 2/3, then 2/3 again. Recursive and lumbering.' },
+  };
+
   // ─── State ───────────────────────────────────────────────────────────
   const state = {
     array: [],
     n: 64,
-    indices: { compare: [-1, -1], write: -1, sorted: new Set() },
+    algo: 'bubble',
+    indices: { compare: [-1, -1], write: -1, sorted: new Set(), pivot: -1, sweep: [] },
     running: false,
     paused: false,
     iterator: null,
@@ -326,7 +522,7 @@
     rafId: null,
     accumulator: 0,
     lastFrameTime: 0,
-    speed: 120, // ops/sec
+    speed: 120,
     volume: 0.35,
     muted: false,
     audioCtx: null,
@@ -348,6 +544,26 @@
   window.addEventListener('resize', resizeCanvas);
 
   // ─── Audio ───────────────────────────────────────────────────────────
+  // Pentatonic scale frequencies (C major pentatonic across 3 octaves)
+  // C D E G A  — 15 notes from C3 to A5
+  const PENTATONIC = (() => {
+    const semitones = [0, 2, 4, 7, 9]; // C D E G A
+    const notes = [];
+    for (let octave = 3; octave <= 5; octave++) {
+      for (const s of semitones) {
+        const midi = (octave + 1) * 12 + s;
+        notes.push(440 * Math.pow(2, (midi - 69) / 12));
+      }
+    }
+    return notes; // 15 notes
+  })();
+
+  function valueToFreq(value) {
+    const t = (value - 1) / Math.max(1, state.n - 1);
+    const idx = Math.round(t * (PENTATONIC.length - 1));
+    return PENTATONIC[Math.max(0, Math.min(PENTATONIC.length - 1, idx))];
+  }
+
   function ensureAudio() {
     if (!state.audioCtx) {
       const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -363,11 +579,7 @@
     const ac = state.audioCtx;
     if (!ac) return;
 
-    // Map value (1..n) to frequency (200 Hz .. 1200 Hz) logarithmically
-    const t = (value - 1) / Math.max(1, state.n - 1);
-    const minFreq = 220, maxFreq = 1100;
-    const freq = minFreq * Math.pow(maxFreq / minFreq, t);
-
+    const freq = valueToFreq(value);
     const osc = ac.createOscillator();
     const gain = ac.createGain();
     const now = ac.currentTime;
@@ -375,14 +587,14 @@
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, now);
 
-    // Tiny soft pluck: attack 5ms, decay 80ms
+    // Soft pluck: short attack, smooth decay — no clicks
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(state.volume * 0.35, now + 0.005);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.090);
+    gain.gain.linearRampToValueAtTime(state.volume * 0.32, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
     osc.connect(gain).connect(ac.destination);
     osc.start(now);
-    osc.stop(now + 0.10);
+    osc.stop(now + 0.13);
   }
 
   // ─── Dataset generation ──────────────────────────────────────────────
@@ -398,7 +610,6 @@
         arr.push(1 + Math.floor(Math.random() * buckets) * Math.floor(n / buckets));
       }
     } else {
-      // random
       for (let i = 1; i <= n; i++) arr.push(i);
       for (let i = n - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -408,9 +619,8 @@
     return arr;
   }
 
-  // ─── Sorting algorithms (generator pattern) ─────────────────────────
-  // Each yields step objects: { type: 'compare'|'write'|'mark-sorted'|'unmark', ...indices }
-  // The driver applies them, plays sound, redraws.
+  // ─── Sorting algorithms (generator pattern) ──────────────────────────
+  // Yields: { type: 'compare'|'write'|'mark-sorted'|'set-pivot'|'sweep', ... }
 
   function* bubbleSort(a) {
     const n = a.length;
@@ -472,12 +682,45 @@
     yield { type: 'mark-sorted', i: n - 1 };
   }
 
+  function* cocktailSort(a) {
+    const n = a.length;
+    let lo = 0, hi = n - 1;
+    while (lo < hi) {
+      let newHi = lo;
+      for (let j = lo; j < hi; j++) {
+        yield { type: 'compare', i: j, j: j + 1 };
+        if (a[j] > a[j + 1]) {
+          [a[j], a[j + 1]] = [a[j + 1], a[j]];
+          yield { type: 'write', i: j, value: a[j] };
+          yield { type: 'write', i: j + 1, value: a[j + 1] };
+          newHi = j;
+        }
+      }
+      yield { type: 'mark-sorted', i: hi };
+      hi = newHi;
+      let newLo = hi;
+      for (let j = hi; j > lo; j--) {
+        yield { type: 'compare', i: j - 1, j };
+        if (a[j - 1] > a[j]) {
+          [a[j - 1], a[j]] = [a[j], a[j - 1]];
+          yield { type: 'write', i: j - 1, value: a[j - 1] };
+          yield { type: 'write', i: j, value: a[j] };
+          newLo = j;
+        }
+      }
+      yield { type: 'mark-sorted', i: lo };
+      lo = newLo;
+    }
+    if (lo === hi) yield { type: 'mark-sorted', i: lo };
+  }
+
   function* quickSort(a, lo = 0, hi = a.length - 1) {
     if (lo >= hi) {
       if (lo === hi) yield { type: 'mark-sorted', i: lo };
       return;
     }
     // Lomuto partition with last element as pivot
+    yield { type: 'set-pivot', i: hi };
     const pivot = a[hi];
     let i = lo - 1;
     for (let j = lo; j < hi; j++) {
@@ -495,6 +738,7 @@
     yield { type: 'write', i: i + 1, value: a[i + 1] };
     yield { type: 'write', i: hi, value: a[hi] };
     yield { type: 'mark-sorted', i: i + 1 };
+    yield { type: 'set-pivot', i: -1 };
     yield* quickSort(a, lo, i);
     yield* quickSort(a, i + 2, hi);
   }
@@ -504,7 +748,6 @@
     const mid = (lo + hi) >> 1;
     yield* mergeSort(a, lo, mid);
     yield* mergeSort(a, mid + 1, hi);
-    // merge
     const left = a.slice(lo, mid + 1);
     const right = a.slice(mid + 1, hi + 1);
     let i = 0, j = 0, k = lo;
@@ -533,12 +776,106 @@
     }
   }
 
+  function* radixSort(a) {
+    // LSD radix sort — base 10, 3 passes (values 1..n, max ~128)
+    const n = a.length;
+    const maxVal = Math.max(...a);
+    const passes = Math.floor(Math.log10(maxVal)) + 1;
+    const base = 10;
+
+    for (let pass = 0; pass < passes; pass++) {
+      const divisor = Math.pow(base, pass);
+      // Count
+      const count = new Array(base).fill(0);
+      for (let i = 0; i < n; i++) {
+        const digit = Math.floor(a[i] / divisor) % base;
+        count[digit]++;
+      }
+      // Prefix sum
+      for (let d = 1; d < base; d++) count[d] += count[d - 1];
+      // Build output (read right-to-left for stability)
+      const output = new Array(n);
+      // Emit "sweep" visual: highlight each bucket slot
+      yield { type: 'sweep', indices: Array.from({ length: n }, (_, i) => i) };
+      for (let i = n - 1; i >= 0; i--) {
+        const digit = Math.floor(a[i] / divisor) % base;
+        output[--count[digit]] = a[i];
+        yield { type: 'compare', i, j: i }; // visual: reading position
+      }
+      // Write back
+      for (let i = 0; i < n; i++) {
+        a[i] = output[i];
+        yield { type: 'write', i, value: a[i] };
+      }
+    }
+    for (let i = 0; i < n; i++) yield { type: 'mark-sorted', i };
+  }
+
+  function* pancakeSort(a) {
+    // Flip prefix of length k: reverse a[0..k-1]
+    function* flip(k) {
+      let lo = 0, hi = k - 1;
+      while (lo < hi) {
+        [a[lo], a[hi]] = [a[hi], a[lo]];
+        yield { type: 'write', i: lo, value: a[lo] };
+        yield { type: 'write', i: hi, value: a[hi] };
+        lo++; hi--;
+      }
+    }
+    const n = a.length;
+    for (let size = n; size > 1; size--) {
+      // Find max in a[0..size-1]
+      let maxIdx = 0;
+      for (let i = 1; i < size; i++) {
+        yield { type: 'compare', i: maxIdx, j: i };
+        if (a[i] > a[maxIdx]) maxIdx = i;
+      }
+      if (maxIdx !== size - 1) {
+        if (maxIdx !== 0) {
+          // Flip max to front
+          yield { type: 'set-pivot', i: maxIdx };
+          yield* flip(maxIdx + 1);
+          yield { type: 'set-pivot', i: -1 };
+        }
+        // Flip max to final position
+        yield { type: 'set-pivot', i: 0 };
+        yield* flip(size);
+        yield { type: 'set-pivot', i: -1 };
+      }
+      yield { type: 'mark-sorted', i: size - 1 };
+    }
+    yield { type: 'mark-sorted', i: 0 };
+  }
+
+  function* stoogeSort(a, lo = 0, hi = a.length - 1) {
+    if (a[lo] > a[hi]) {
+      [a[lo], a[hi]] = [a[hi], a[lo]];
+      yield { type: 'write', i: lo, value: a[lo] };
+      yield { type: 'write', i: hi, value: a[hi] };
+    }
+    if (hi - lo + 1 > 2) {
+      const t = Math.floor((hi - lo + 1) / 3);
+      yield { type: 'compare', i: lo, j: hi };
+      yield* stoogeSort(a, lo, hi - t);
+      yield* stoogeSort(a, lo + t, hi);
+      yield* stoogeSort(a, lo, hi - t);
+    }
+    // Mark sorted only at top level
+    if (lo === 0 && hi === a.length - 1) {
+      for (let i = 0; i < a.length; i++) yield { type: 'mark-sorted', i };
+    }
+  }
+
   const algorithms = {
-    bubble: bubbleSort,
+    bubble:    bubbleSort,
     insertion: insertionSort,
     selection: selectionSort,
-    quick: quickSort,
-    merge: mergeSort,
+    cocktail:  cocktailSort,
+    quick:     quickSort,
+    merge:     mergeSort,
+    radix:     radixSort,
+    pancake:   pancakeSort,
+    stooge:    stoogeSort,
   };
 
   // ─── Driver ──────────────────────────────────────────────────────────
@@ -547,7 +884,6 @@
       state.indices.compare = [step.i, step.j];
       state.indices.write = -1;
       state.comparisons++;
-      // Tone is the average of the two compared values
       const v = (state.array[step.i] + state.array[step.j]) / 2;
       playTone(v);
     } else if (step.type === 'write') {
@@ -558,6 +894,10 @@
       playTone(step.value);
     } else if (step.type === 'mark-sorted') {
       state.indices.sorted.add(step.i);
+    } else if (step.type === 'set-pivot') {
+      state.indices.pivot = step.i;
+    } else if (step.type === 'sweep') {
+      state.indices.sweep = step.indices || [];
     } else if (step.type === 'unmark') {
       state.indices.sorted.delete(step.i);
     }
@@ -598,17 +938,17 @@
     state.running = false;
     state.paused = false;
     state.iterator = null;
-    // Mark all sorted (in case algorithm didn't yield them all)
     for (let i = 0; i < state.array.length; i++) state.indices.sorted.add(i);
     state.indices.compare = [-1, -1];
     state.indices.write = -1;
+    state.indices.pivot = -1;
+    state.indices.sweep = [];
     $('status').textContent = 'done';
-    $('run').textContent = '▶  Run';
+    $('run').textContent = 'Run';
     if (state.rafId) cancelAnimationFrame(state.rafId);
     state.rafId = null;
     draw();
     updateMeter();
-    // Victory sweep
     sweepTone();
   }
 
@@ -618,21 +958,20 @@
     const ac = state.audioCtx;
     if (!ac) return;
     const sortedArr = [...state.array];
-    const total = 0.6;
+    const total = 0.7;
     sortedArr.forEach((v, i) => {
       const when = ac.currentTime + (i / sortedArr.length) * total;
+      const freq = valueToFreq(v);
       const osc = ac.createOscillator();
       const gain = ac.createGain();
-      const t = (v - 1) / Math.max(1, state.n - 1);
-      const freq = 220 * Math.pow(5, t);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, when);
       gain.gain.setValueAtTime(0, when);
-      gain.gain.linearRampToValueAtTime(state.volume * 0.25, when + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.001, when + 0.06);
+      gain.gain.linearRampToValueAtTime(state.volume * 0.22, when + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.001, when + 0.07);
       osc.connect(gain).connect(ac.destination);
       osc.start(when);
-      osc.stop(when + 0.07);
+      osc.stop(when + 0.08);
     });
   }
 
@@ -653,16 +992,21 @@
       const x = pad + i * barW;
       const y = h - pad - barH;
 
-      // Color logic
       let fill = '#3a3225';
+      if (state.indices.sorted.has(i)) {
+        fill = '#5e7c3c';
+      }
+      if (state.indices.sweep.includes(i)) {
+        fill = '#7a6840';
+      }
       if (state.indices.compare[0] === i || state.indices.compare[1] === i) {
         fill = '#c89a3a';
       }
       if (state.indices.write === i) {
         fill = '#b8462e';
       }
-      if (state.indices.sorted.has(i)) {
-        fill = '#5e7c3c';
+      if (state.indices.pivot === i) {
+        fill = '#8e5aa0'; // purple for pivot
       }
 
       ctx.fillStyle = fill;
@@ -674,6 +1018,15 @@
     $('comparisons').textContent = state.comparisons;
     $('writes').textContent = state.writes;
     $('elapsed').textContent = (state.elapsedMs / 1000).toFixed(2) + 's';
+  }
+
+  // ─── Now playing ─────────────────────────────────────────────────────
+  function updateNowPlaying(key) {
+    const meta = ALGO_META[key];
+    if (!meta) return;
+    $('np-name').textContent = meta.name;
+    $('np-complexity').textContent = meta.complexity;
+    $('np-note').textContent = meta.note;
   }
 
   // ─── Reset / Start ───────────────────────────────────────────────────
@@ -688,47 +1041,45 @@
     state.elapsedMs = 0;
     state.accumulator = 0;
     state.lastFrameTime = 0;
-    state.indices = { compare: [-1, -1], write: -1, sorted: new Set() };
+    state.indices = { compare: [-1, -1], write: -1, sorted: new Set(), pivot: -1, sweep: [] };
     state.n = parseInt($('size').value, 10);
     state.array = makeArray(state.n, $('shape').value);
     $('status').textContent = 'idle';
-    $('run').textContent = '▶  Run';
+    $('run').textContent = 'Run';
     updateMeter();
     draw();
   }
 
   function start() {
     if (state.running && !state.paused) {
-      // Pause
       state.paused = true;
       $('status').textContent = 'paused';
-      $('run').textContent = '▶  Resume';
+      $('run').textContent = 'Resume';
       return;
     }
     if (state.running && state.paused) {
       state.paused = false;
       state.lastFrameTime = 0;
       $('status').textContent = 'running';
-      $('run').textContent = '⏸  Pause';
+      $('run').textContent = 'Pause';
       return;
     }
-    // Fresh run — iterator drives ops by index; applyStep mutates state.array
     ensureAudio();
     if (!state.iterator) {
-      state.iterator = algorithms[$('algo').value](state.array);
+      state.iterator = algorithms[state.algo](state.array);
     }
     state.running = true;
     state.paused = false;
     state.lastFrameTime = 0;
     $('status').textContent = 'running';
-    $('run').textContent = '⏸  Pause';
+    $('run').textContent = 'Pause';
     state.rafId = requestAnimationFrame(tick);
   }
 
   function singleStep() {
     if (!state.iterator) {
       ensureAudio();
-      state.iterator = algorithms[$('algo').value](state.array);
+      state.iterator = algorithms[state.algo](state.array);
     }
     const next = state.iterator.next();
     if (next.done) {
@@ -741,12 +1092,31 @@
     }
   }
 
+  function toggleMute() {
+    state.muted = !state.muted;
+    const btn = $('mute-btn');
+    btn.textContent = state.muted ? 'Unmute' : 'Mute';
+    btn.classList.toggle('active', state.muted);
+    $('volume-val').textContent = state.muted ? 'off' : Math.round(state.volume * 100);
+  }
+
   // ─── Wire up ─────────────────────────────────────────────────────────
   $('run').addEventListener('click', start);
   $('step').addEventListener('click', singleStep);
   $('reset').addEventListener('click', reset);
+  $('mute-btn').addEventListener('click', toggleMute);
 
-  $('algo').addEventListener('change', reset);
+  // Sidebar algo list
+  document.querySelectorAll('#algo-list li').forEach(li => {
+    li.addEventListener('click', () => {
+      document.querySelectorAll('#algo-list li').forEach(x => x.classList.remove('active'));
+      li.classList.add('active');
+      state.algo = li.dataset.algo;
+      updateNowPlaying(state.algo);
+      reset();
+    });
+  });
+
   $('size').addEventListener('change', reset);
   $('shape').addEventListener('change', reset);
 
@@ -758,13 +1128,12 @@
   $('volume').addEventListener('input', (e) => {
     const v = parseInt(e.target.value, 10);
     state.volume = v / 100;
-    $('volume-val').textContent = v;
+    if (!state.muted) $('volume-val').textContent = v;
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'm' || e.key === 'M') {
-      state.muted = !state.muted;
-      $('volume-val').textContent = state.muted ? 'muted' : Math.round(state.volume * 100);
+      toggleMute();
     } else if (e.key === ' ') {
       e.preventDefault();
       start();
@@ -778,6 +1147,7 @@
   // ─── Init ────────────────────────────────────────────────────────────
   resizeCanvas();
   reset();
+  updateNowPlaying(state.algo);
 })();
 </script>
 </body>
