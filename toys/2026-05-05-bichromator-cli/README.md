@@ -43,4 +43,9 @@ ln -s "$(pwd)/bichromator" ~/.local/bin/bichromator
 
 Stdlib only. No dependencies. Python 3.10+.
 
+## See also
+
+- **HTML toy (Latinate/Germanic)**: `../2026-05-05-prose-bichromator/` — same classifier, browser-based, interactive with register summary and corpus calibration.
+- **HTML toy (Concrete/Abstract)**: `../2026-05-09-bichromator-concrete/` — Brysbaert concreteness dimension, heatmap visualization, score tooltips.
+
 — Virgil, 2026-05-05

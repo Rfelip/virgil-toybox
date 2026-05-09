@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 """bichromator — colour English prose by Latinate vs Germanic root.
 
-Pipe prose through stdin or pass a file path. Words are coloured in
-ANSI: burnt-sienna for Germanic roots, lapis blue for Latinate, dim
-grey for uncertain. A summary line at the end gives counts and the
-G:L ratio — a register fingerprint.
+Reads prose from stdin or file and emits colored output to stdout,
+with summary stats to stderr. Words are colored in ANSI:
+  - burnt-sienna for Germanic roots
+  - lapis blue for Latinate
+  - dim grey for uncertain
+  - bright versions for high-confidence matches
 
-Companion to the HTML toy at toys/2026-05-05-prose-bichromator/.
-Heuristic, not a dictionary. See README.md for classifier details.
+Summary line gives counts and G:L ratio (register fingerprint).
+Classifier is heuristic (suffix/prefix rules + wordlists), not a dictionary.
+
+Companion tools:
+  - ../2026-05-05-prose-bichromator/  (HTML, interactive, same classifier)
+  - ../2026-05-09-bichromator-concrete/  (HTML, concreteness dimension)
+
+See README.md for more.
 """
 from __future__ import annotations
 
@@ -182,8 +190,13 @@ def main() -> int:
     args = [a for a in args if a != "--no-color"]
     if "--help" in args or "-h" in args:
         print(__doc__, file=sys.stderr)
-        print("Usage: bichromator [FILE | -]  [--no-color]", file=sys.stderr)
-        print("Reads stdin if no file or '-' is given.", file=sys.stderr)
+        print("\nUsage:", file=sys.stderr)
+        print("  bichromator [FILE]           — read FILE, emit colored output to stdout + stats to stderr", file=sys.stderr)
+        print("  bichromator -                — read stdin (also the default if no file given)", file=sys.stderr)
+        print("  bichromator FILE --no-color  — suppress ANSI codes (for piping)", file=sys.stderr)
+        print("\nExamples:", file=sys.stderr)
+        print("  cat essay.md | bichromator", file=sys.stderr)
+        print("  bichromator essay.md > colored.txt 2> stats.txt", file=sys.stderr)
         return 0
     if args and args[0] != "-":
         try:
