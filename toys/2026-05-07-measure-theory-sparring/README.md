@@ -15,30 +15,35 @@ Or just open `index.html` directly — the CDN-fetched KaTeX works on
 
 ## Deck
 
-19 hand-curated cards across:
-- σ-algebras (definition, generated, Borel)
-- Measurable functions (4 equivalent characterizations, sup/inf/limsup, composition traps)
-- Convergence theorems (MCT, DCT, Fatou, "which one applies?")
-- Lp spaces (Hölder, Minkowski, completeness, inclusions)
-- Radon–Nikodym (statement, σ-finite need, density meaning)
-- Fubini–Tonelli (the workflow, the classical counterexample)
-- Borel–Cantelli, Egorov + Lusin, Lebesgue differentiation
-- Probability glue (σ(X), conditional expectation as R-N derivative, SAA convergence)
+`cards.js` is **auto-generated** from the canonical markdown decks in
+the vault. To regenerate:
 
-Each card has:
-- A prompt (theorem statement, scenario, counterexample request)
-- A canonical answer with KaTeX math
-- A "trick" or "trap" callout — the thing that stops being obvious once
-  you've thought about it for ten years and come back to teach it
+```bash
+cd ~/Desktop/personal_obsidian
+python3 Virgil/scripts/sparring-deck-to-toy.py \
+  --src "med:02 - Projetos/Personal/PER10 - Teoria da Medida (FGV)/sparring-deck-medida.md" \
+  --src "otim:02 - Projetos/Personal/PER11 - Otimização (FGV)/sparring-deck-otimizacao.md" \
+  -o ~/Desktop/Virgil/virgil-toybox/toys/2026-05-07-measure-theory-sparring/cards.js
+```
+
+Current deck: **137 cards** across two source files
+- `med-NN` — 72 cards on measure theory (Bartle Cap 2–10)
+- `otim-NN` — 65 cards on convex analysis & optimization (Vincent Guigues notes)
+
+Card schema:
+```
+{ id, topic, title, prompt, answer, ref, byRuan, hard }
+```
+
+Cards marked `byRuan: true` were originally hand-written by Ruan in
+the first iteration of this toy and re-imported through the vault deck.
 
 ## Companion Tools
 
-For the full exam prep suite (72 cards + 10 hard review set):
-- **TUI sparring runner:** `Virgil/scripts/sparring medida` — offline terminal UI for drilling with spaced-repetition state
-- **Canonical vault deck:** `02 - Projetos/Personal/PER10 - Teoria da Medida (FGV)/sparring-deck-medida.md` — markdown source with full review notes, Bartle references, and difficulty layers
-- **Optimization deck:** `02 - Projetos/Personal/PER11 - Otimização (FGV)/sparring-deck-otimizacao.md` — companion sparring deck for Vincent Guigues' convex optimization notes
-
-This web toy keeps the original 19 cards as a frozen reference. New cards and growth are in the vault deck.
+- **TUI sparring runner** — `Virgil/scripts/sparring medida` / `sparring otim` — offline terminal UI for drilling with SRS-lite state. Same source decks.
+- **Canonical vault decks**:
+  - `02 - Projetos/Personal/PER10 - Teoria da Medida (FGV)/sparring-deck-medida.md`
+  - `02 - Projetos/Personal/PER11 - Otimização (FGV)/sparring-deck-otimizacao.md`
 
 ## Mechanics
 
