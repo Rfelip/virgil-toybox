@@ -117,6 +117,65 @@
 
       <div class="card-grid">
 
+        <a class="toy-card" href="toys/2026-05-09-sound-of-primes/">
+          <div class="toy-card-art" aria-hidden="true">
+            <!-- Sieve grid: a lattice of numbers, some crossed, some glowing as primes -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="14" width="88" height="72" fill="#faf6ec" stroke="#2a2419" stroke-width="0.8" />
+              <!-- Grid of number cells, 5 cols x 4 rows -->
+              <!-- Row 1: 2 3 4 5 6 -->
+              <rect x="12" y="20" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="18.5" y="27.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">2</text>
+              <rect x="27" y="20" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="33.5" y="27.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">3</text>
+              <rect x="42" y="20" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="48.5" y="27.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26" text-decoration="line-through">4</text>
+              <line x1="43" y1="25" x2="54" y2="25" stroke="#a83c26" stroke-width="0.8"/>
+              <rect x="57" y="20" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="63.5" y="27.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">5</text>
+              <rect x="72" y="20" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <line x1="73" y1="25" x2="84" y2="25" stroke="#a83c26" stroke-width="0.8"/>
+              <text x="78.5" y="27.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26">6</text>
+              <!-- Row 2: 7 8 9 10 11 -->
+              <rect x="12" y="33" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="18.5" y="40.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">7</text>
+              <rect x="27" y="33" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <line x1="28" y1="38" x2="39" y2="38" stroke="#a83c26" stroke-width="0.8"/>
+              <text x="33.5" y="40.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26">8</text>
+              <rect x="42" y="33" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <line x1="43" y1="38" x2="54" y2="38" stroke="#a83c26" stroke-width="0.8"/>
+              <text x="48.5" y="40.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26">9</text>
+              <rect x="57" y="33" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <line x1="58" y1="38" x2="69" y2="38" stroke="#a83c26" stroke-width="0.8"/>
+              <text x="63.5" y="40.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26">10</text>
+              <rect x="72" y="33" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="78.5" y="40.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">11</text>
+              <!-- Row 3: 12 13 ... sparse -->
+              <rect x="12" y="46" width="13" height="10" fill="rgba(168,60,38,0.08)" stroke="#2a2419" stroke-width="0.3"/>
+              <line x1="13" y1="51" x2="24" y2="51" stroke="#a83c26" stroke-width="0.8"/>
+              <text x="18.5" y="53.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#a83c26">12</text>
+              <rect x="27" y="46" width="13" height="10" fill="rgba(184,140,42,0.22)" stroke="#2a2419" stroke-width="0.3"/>
+              <text x="33.5" y="53.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="5" fill="#1a1814">13</text>
+              <!-- Waveform arc at bottom — the audio part -->
+              <path d="M 12 72 Q 22 62 32 72 Q 42 82 52 72 Q 62 62 72 72 Q 82 82 88 72" fill="none" stroke="#2a2419" stroke-width="0.8"/>
+              <!-- Musical note -->
+              <text x="88" y="68" font-family="serif" font-size="7" fill="#b88c2a">&#9835;</text>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Sound of Primes</h3>
+            <p class="card-sub">number-theoretic sequences as music</p>
+            <p class="card-blurb">
+              Twin primes, Goldbach pairs, the Sieve of Eratosthenes,
+              Mersenne bells, Collatz trajectories &mdash; eight modes.
+              Primes sing sine; composites buzz square; the sieve
+              clicks and rings its way through a grid of numbers.
+              Pentatonic C major, C3&ndash;A5.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <a class="toy-card" href="toys/2026-05-08-night-gazette/">
           <div class="toy-card-art" aria-hidden="true">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">

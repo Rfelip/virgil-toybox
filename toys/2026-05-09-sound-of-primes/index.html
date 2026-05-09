@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound of Primes — The Night Gazette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper: #f6f2e9;
+    --paper-shadow: #ece7d8;
+    --ink: #1a1814;
+    --ink-soft: #54493a;
+    --accent-amber: #b88c2a;
+    --accent-red: #a83c26;
+    --accent-blue: #2a5090;
+    --accent-green: #4a7030;
+    --rule: rgba(26, 24, 20, 0.16);
+  }
+
+  html, body {
+    width: 100%; min-height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+  }
+
+  body {
+    padding: 32px 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.45), transparent 55%),
+      radial-gradient(circle at 85% 85%, rgba(0,0,0,0.03), transparent 50%),
+      var(--paper);
+  }
+
+  header {
+    border-bottom: 2px double var(--rule);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-top: 6px;
+  }
+
+  .masthead {
+    text-align: right;
+    font-family: 'IBM Plex Mono', 'Menlo', 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .masthead em { font-style: italic; color: var(--ink); }
+
+  /* ─── Layout ─── */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    border: 1px solid var(--rule);
+    background: rgba(255, 252, 240, 0.7);
+  }
+
+  .sidebar-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mode-list {
+    list-style: none;
+    padding: 4px 0;
+  }
+
+  .mode-list li {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    line-height: 1.2;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+    color: var(--ink-soft);
+  }
+
+  .mode-list li:hover {
+    background: rgba(184, 140, 42, 0.1);
+    color: var(--ink);
+  }
+
+  .mode-list li.active {
+    border-left-color: var(--accent-amber);
+    color: var(--ink);
+    background: rgba(184, 140, 42, 0.12);
+    font-weight: 500;
+  }
+
+  .mode-list li .mode-sub {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    opacity: 0.65;
+  }
+
+  .mode-list li.active .mode-sub { opacity: 1; }
+
+  /* ─── Right column ─── */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ─── Stage ─── */
+  .stage {
+    position: relative;
+    background: #faf6ec;
+    border: 1px solid var(--rule);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 260px;
+  }
+
+  /* ─── Scroll ticker ─── */
+  .scroll-ticker {
+    border-top: 1px solid var(--rule);
+    overflow: hidden;
+    height: 32px;
+    position: relative;
+    background: rgba(26, 24, 20, 0.03);
+  }
+
+  .scroll-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 12px;
+    gap: 0;
+    white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    transition: none;
+  }
+
+  .tick-num {
+    display: inline-block;
+    padding: 2px 6px;
+    min-width: 30px;
+    text-align: center;
+    transition: none;
+    border-radius: 0;
+  }
+
+  .tick-num.prime     { color: var(--ink); background: rgba(184,140,42,0.18); }
+  .tick-num.composite { color: var(--ink-soft); }
+  .tick-num.current   { color: var(--paper); background: var(--ink); font-weight: 500; }
+  .tick-num.twin      { color: var(--accent-blue); background: rgba(42,80,144,0.12); }
+  .tick-num.mersenne  { color: var(--accent-red); background: rgba(168,60,38,0.12); font-weight: 500; }
+
+  /* ─── Now playing ─── */
+  .now-playing {
+    padding: 10px 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    background: rgba(250, 246, 236, 0.9);
+  }
+
+  .now-playing-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .now-playing-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--accent-amber);
+    white-space: nowrap;
+  }
+
+  .now-playing-note {
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    flex: 1;
+    text-align: right;
+  }
+
+  /* ─── Controls ─── */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto auto auto auto;
+    gap: 14px 18px;
+    align-items: end;
+    padding: 16px 18px;
+    background: rgba(255, 252, 240, 0.7);
+    border: 1px solid var(--rule);
+  }
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 70px;
+  }
+
+  .control label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  input[type=range] {
+    padding: 0;
+    accent-color: var(--ink);
+    width: 100%;
+  }
+
+  input[type=number] {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 4px 6px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    width: 100%;
+  }
+
+  input[type=number]:focus { outline: 1px solid var(--ink); }
+
+  button {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    padding: 7px 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+    white-space: nowrap;
+    align-self: end;
+  }
+
+  button:hover { background: var(--accent-red); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; background: var(--ink); }
+
+  button.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+
+  button.secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  button.mute-btn {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  button.mute-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ─── Collatz seed row ─── */
+  .collatz-row {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: rgba(255, 252, 240, 0.5);
+    border: 1px solid var(--rule);
+    border-top: none;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .collatz-row.visible { display: flex; }
+  .collatz-row label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* ─── Meter ─── */
+  .meter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 10px 18px;
+    background: rgba(255, 252, 240, 0.5);
+    border: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .meter span { color: var(--ink-soft); }
+  .meter b { font-weight: 500; color: var(--ink); }
+
+  /* ─── Mode notes section ─── */
+  .notes {
+    margin-top: 26px;
+    columns: 3;
+    column-gap: 30px;
+    column-rule: 1px solid var(--rule);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .notes h3 {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 3px;
+    margin-top: 8px;
+    break-after: avoid;
+    font-size: 14.5px;
+  }
+
+  .notes h3:first-child { margin-top: 0; }
+  .notes p { margin-bottom: 10px; }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 900px) {
+    body { padding: 20px 16px; }
+    h1 { font-size: 28px; }
+    header { grid-template-columns: 1fr; }
+    .masthead { text-align: left; }
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+    .controls { grid-template-columns: 1fr 1fr; }
+    .meter { grid-template-columns: 1fr 1fr; }
+    .notes { columns: 1; }
+    .now-playing { flex-direction: column; gap: 4px; }
+    .now-playing-note { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Sound of Primes</h1>
+    <div class="tagline">Eight number-theoretic sequences, made audible. Each has its own arithmetic song.</div>
+  </div>
+  <div class="masthead">
+    <div>The <em>Night Gazette</em></div>
+    <div>Vol. I &mdash; Toybox No. 13</div>
+    <div>2026-05-09 &middot; V</div>
+  </div>
+</header>
+
+<div class="main-layout">
+
+  <!-- Sidebar: mode list -->
+  <aside class="sidebar">
+    <div class="sidebar-header">Sequence</div>
+    <ul class="mode-list" id="mode-list">
+      <li data-mode="primes" class="active">
+        Primes
+        <span class="mode-sub">2, 3, 5, 7, 11 &hellip;</span>
+      </li>
+      <li data-mode="composites">
+        Composites
+        <span class="mode-sub">4, 6, 8, 9, 10 &hellip;</span>
+      </li>
+      <li data-mode="twin-primes">
+        Twin Primes
+        <span class="mode-sub">(3,5) (5,7) (11,13) &hellip;</span>
+      </li>
+      <li data-mode="prime-gaps">
+        Prime Gaps
+        <span class="mode-sub">g = p_{n+1} - p_n</span>
+      </li>
+      <li data-mode="goldbach">
+        Goldbach Pairs
+        <span class="mode-sub">2k = p + q</span>
+      </li>
+      <li data-mode="sieve">
+        Sieve of Eratosthenes
+        <span class="mode-sub">crossing-out numbers</span>
+      </li>
+      <li data-mode="mersenne">
+        Mersenne Primes
+        <span class="mode-sub">2^p - 1</span>
+      </li>
+      <li data-mode="collatz">
+        Collatz
+        <span class="mode-sub">3n+1 trajectories</span>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Right column -->
+  <div class="right-col">
+
+    <div class="stage">
+      <canvas id="canvas"></canvas>
+      <div class="scroll-ticker" id="scroll-ticker">
+        <div class="scroll-inner" id="scroll-inner"></div>
+      </div>
+      <div class="now-playing">
+        <span class="now-playing-name" id="np-name">Primes</span>
+        <span class="now-playing-id" id="np-id">n = 0</span>
+        <span class="now-playing-note" id="np-note">Each prime fires a sine tone. Pitch: prime mod scale. Sparse, spreading wider as primes thin out.</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control">
+        <label for="n-limit">Up to N</label>
+        <input type="number" id="n-limit" min="10" max="1000" value="200" step="10">
+      </div>
+
+      <div class="control">
+        <label for="speed">Step: <span id="speed-val">200</span>ms</label>
+        <input type="range" id="speed" min="50" max="1000" value="200">
+      </div>
+
+      <div class="control">
+        <label for="volume">Volume: <span id="volume-val">40</span></label>
+        <input type="range" id="volume" min="0" max="100" value="40">
+      </div>
+
+      <button id="play-btn">Play</button>
+      <button class="secondary" id="reset-btn">Reset</button>
+      <button class="mute-btn" id="mute-btn">Mute</button>
+    </div>
+
+    <div class="collatz-row" id="collatz-row">
+      <label for="collatz-seed">Collatz seed:</label>
+      <input type="number" id="collatz-seed" min="2" max="999" value="27" style="width:80px; font-family:'IBM Plex Mono',monospace; font-size:13px; padding:4px 6px; background:var(--paper); border:1px solid var(--rule); color:var(--ink);">
+    </div>
+
+    <div class="meter">
+      <div><span>Step:</span> <b id="m-step">0</b></div>
+      <div><span>Current:</span> <b id="m-current">&mdash;</b></div>
+      <div><span>Count:</span> <b id="m-count">0</b></div>
+      <div><span>Status:</span> <b id="m-status">idle</b></div>
+    </div>
+
+  </div>
+</div>
+
+<section class="notes">
+  <h3>Primes</h3>
+  <p>The classic sequence: 2, 3, 5, 7, 11, 13&hellip; Each prime triggers a sine tone. Pitch wraps around the pentatonic scale via (prime mod scale_size). Primes grow sparser&mdash;the silences between tones widen as N increases.</p>
+
+  <h3>Composites</h3>
+  <p>The complement of the primes: 4, 6, 8, 9, 10, 12&hellip; Uses a square wave oscillator&mdash;sharper, more mechanical than the primes' sine. The density is high and the sound feels crowded, which is mathematically appropriate.</p>
+
+  <h3>Twin Primes</h3>
+  <p>Prime pairs (p, p+2) where both are prime: (3,5), (5,7), (11,13), (17,19)&hellip; Each pair plays as a two-note chord with a brief 60ms delay between voices&mdash;a pluck-pluck. It is an open conjecture that infinitely many twin primes exist.</p>
+
+  <h3>Prime Gaps</h3>
+  <p>The gap g_n = p_{n+1} - p_n between consecutive primes. For most small n the gap is 2 (twin primes); occasional large gaps (like g(23)=6, or Bertrand's famous large gaps) sound as high, isolated notes.</p>
+
+  <h3>Goldbach Pairs</h3>
+  <p>Goldbach's conjecture (1742, unproven): every even integer &gt; 2 equals the sum of two primes. For each even n, find a representation n = p + q and play p then q in quick succession. The two tones converge as p and q balance toward n/2.</p>
+
+  <h3>Sieve of Eratosthenes</h3>
+  <p>The ancient algorithm: start from 2, mark all its multiples as composite, advance to the next unmarked number, repeat. Crossing-out composites plays a dry click; surviving primes ring a sine tone. Watch the canvas&mdash;the crossed numbers appear as the sieve sweeps through.</p>
+
+  <h3>Mersenne Primes</h3>
+  <p>Primes of the form 2^p - 1: 3, 7, 31, 127, 8191, 131071, 524287&hellip; They are extraordinarily rare&mdash;only 51 are known as of 2024. This mode plays the known small Mersenne primes in sequence with a deep, sustained bass tone. Each one feels like a slow bell.</p>
+
+  <h3>Collatz (3n+1)</h3>
+  <p>From any starting seed, repeatedly apply: if even, divide by 2; if odd, multiply by 3 and add 1. The trajectory always (conjectured) reaches 1. The pitch traces the trajectory value; the trajectory from seed 27 takes 111 steps and peaks at 9232 before crashing to 1.</p>
+</section>
+
+<footer>
+  Built by Virgil. Press <b>Space</b> to play/pause, <b>R</b> to reset, <b>M</b> to mute. Pentatonic scale, C major, C3&ndash;A5.
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+// ─── Pentatonic scale (C major pentatonic, C3–A5, 15 notes) ──────────────
+const PENTATONIC = (() => {
+  const semitones = [0, 2, 4, 7, 9]; // C D E G A
+  const notes = [];
+  for (let octave = 3; octave <= 5; octave++) {
+    for (const s of semitones) {
+      const midi = (octave + 1) * 12 + s;
+      notes.push(440 * Math.pow(2, (midi - 69) / 12));
+    }
+  }
+  return notes; // 15 notes
+})();
+
+// ─── Sieve of Eratosthenes ────────────────────────────────────────────────
+function buildSieve(limit) {
+  const is_prime = new Uint8Array(limit + 1).fill(1);
+  is_prime[0] = is_prime[1] = 0;
+  for (let i = 2; i * i <= limit; i++) {
+    if (is_prime[i]) {
+      for (let j = i * i; j <= limit; j += i) is_prime[j] = 0;
+    }
+  }
+  return is_prime;
+}
+
+// ─── Mode metadata ────────────────────────────────────────────────────────
+const MODE_META = {
+  'primes':       { name: 'Primes',                 id: '2, 3, 5, 7, 11 …',  note: 'Each prime fires a sine tone. Pitch: prime mod scale. Sparse, spreading wider as primes thin out.' },
+  'composites':   { name: 'Composites',             id: '4, 6, 8, 9, 10 …',  note: 'The complement of primes. Square wave oscillator — sharper, more mechanical. Dense and crowded, which is correct.' },
+  'twin-primes':  { name: 'Twin Primes',            id: '(3,5) (5,7) (11,13) …', note: 'Prime pairs p, p+2 play as two-note chords. 35 twin primes below 1000. Conjectured infinite.' },
+  'prime-gaps':   { name: 'Prime Gaps',             id: 'g_n = p_{n+1} − p_n', note: 'Gaps between consecutive primes. Small gaps (2) sound low; rare large gaps ring high and isolated.' },
+  'goldbach':     { name: 'Goldbach Pairs',         id: '2k = p + q',              note: 'Each even n = p + q. Two tones chase each other toward n/2 as the pairs balance. Unproven conjecture.' },
+  'sieve':        { name: 'Sieve of Eratosthenes',  id: 'cross out composites',    note: 'Composites: dry click. Surviving primes: sine ring. Watch the canvas fill with crossed numbers.' },
+  'mersenne':     { name: 'Mersenne Primes',        id: '2^p − 1',             note: 'Extraordinarily rare primes. Deep sustained bass tones, exponentially spaced. Only 51 known.' },
+  'collatz':      { name: 'Collatz (3n+1)',         id: 'seed trajectory',         note: 'Trajectory from a seed: even → n/2, odd → 3n+1. All known trajectories reach 1. Unproven.' },
+};
+
+// ─── State ────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'primes',
+  running: false,
+  muted: false,
+  volume: 0.4,
+  stepMs: 200,
+  nLimit: 200,
+  audioCtx: null,
+  // Sequence state
+  step: 0,
+  seqData: [],    // the full sequence for the current mode
+  seqPos: 0,      // current position within seqData
+  count: 0,       // events played
+  // Timer
+  timerId: null,
+  // Canvas state
+  sieveState: null, // for sieve mode — which numbers are crossed
+  visNumbers: [],   // numbers to display in canvas (for relevant modes)
+  currentVal: null, // the value playing right now
+  collatzPath: [],  // full collatz path for visualization
+};
+
+// ─── DOM ─────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+
+// ─── Audio ────────────────────────────────────────────────────────────────
+function ensureAudio() {
+  if (!state.audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    state.audioCtx = new Ctx();
+  }
+  if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
+}
+
+function freqFromValue(val, domainMin, domainMax) {
+  const t = Math.max(0, Math.min(1, (val - domainMin) / Math.max(1, domainMax - domainMin)));
+  const idx = Math.round(t * (PENTATONIC.length - 1));
+  return PENTATONIC[Math.max(0, Math.min(PENTATONIC.length - 1, idx))];
+}
+
+function freqFromMod(val) {
+  const idx = ((val % PENTATONIC.length) + PENTATONIC.length) % PENTATONIC.length;
+  return PENTATONIC[idx];
+}
+
+function playTone(freq, type, duration, gain_mul) {
+  if (state.muted || state.volume === 0) return;
+  const ac = state.audioCtx;
+  if (!ac) return;
+  const vol = state.volume * (gain_mul !== undefined ? gain_mul : 1);
+
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  const now = ac.currentTime;
+
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, now);
+
+  const attack = 0.008;
+  const decay = duration || 0.12;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(vol * 0.35, now + attack);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + attack + decay);
+
+  osc.connect(gain).connect(ac.destination);
+  osc.start(now);
+  osc.stop(now + attack + decay + 0.01);
+}
+
+function playClick() {
+  if (state.muted || state.volume === 0) return;
+  const ac = state.audioCtx;
+  if (!ac) return;
+  const gain = ac.createGain();
+  const buf = ac.createBuffer(1, 512, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < 512; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / 80);
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  const now = ac.currentTime;
+  gain.gain.setValueAtTime(state.volume * 0.4, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+  src.connect(gain).connect(ac.destination);
+  src.start(now);
+}
+
+// ─── Sequence Builders ────────────────────────────────────────────────────
+function buildSequence(mode, nLimit, collatzSeed) {
+  const sieve = buildSieve(nLimit);
+  const primes = [];
+  for (let i = 2; i <= nLimit; i++) { if (sieve[i]) primes.push(i); }
+
+  switch (mode) {
+    case 'primes': {
+      // Each event: { val, type:'prime', freq }
+      return primes.map(p => ({ val: p, kind: 'prime', freq: freqFromMod(p) }));
+    }
+    case 'composites': {
+      const composites = [];
+      for (let i = 4; i <= nLimit; i++) { if (!sieve[i]) composites.push(i); }
+      return composites.map(c => ({ val: c, kind: 'composite', freq: freqFromMod(c) }));
+    }
+    case 'twin-primes': {
+      const pairs = [];
+      for (let i = 0; i < primes.length - 1; i++) {
+        if (primes[i + 1] - primes[i] === 2) {
+          pairs.push({ val: primes[i], val2: primes[i + 1], kind: 'twin',
+            freq: freqFromMod(primes[i]), freq2: freqFromMod(primes[i + 1]) });
+        }
+      }
+      return pairs;
+    }
+    case 'prime-gaps': {
+      return primes.slice(0, -1).map((p, i) => {
+        const gap = primes[i + 1] - p;
+        return { val: gap, kind: 'gap', label: p, next: primes[i + 1],
+          freq: freqFromValue(gap, 1, 34) }; // max gap in first 1000 is 34
+      });
+    }
+    case 'goldbach': {
+      const events = [];
+      const sieve2 = buildSieve(nLimit);
+      for (let n = 4; n <= nLimit; n += 2) {
+        // find first Goldbach representation
+        for (let p = 2; p <= n / 2; p++) {
+          if (sieve2[p] && sieve2[n - p]) {
+            events.push({ val: p, val2: n - p, n, kind: 'goldbach',
+              freq: freqFromMod(p), freq2: freqFromMod(n - p) });
+            break;
+          }
+        }
+      }
+      return events;
+    }
+    case 'sieve': {
+      // Simulate the sieve: return events in order of operations
+      const events = [];
+      const is_crossed = new Uint8Array(nLimit + 1);
+      const is_found_prime = new Uint8Array(nLimit + 1);
+      for (let p = 2; p <= nLimit; p++) {
+        if (is_crossed[p]) continue;
+        // p is prime
+        is_found_prime[p] = 1;
+        events.push({ val: p, kind: 'sieve-prime', freq: freqFromMod(p) });
+        for (let j = p * p; j <= nLimit; j += p) {
+          if (!is_crossed[j]) {
+            is_crossed[j] = 1;
+            events.push({ val: j, kind: 'sieve-cross', freq: null });
+          }
+        }
+      }
+      return events;
+    }
+    case 'mersenne': {
+      // Known Mersenne primes up to reasonable size
+      const mersenne_exponents = [2, 3, 5, 7, 13, 17, 19, 31];
+      const known = mersenne_exponents.map(p => ({ p, val: Math.pow(2, p) - 1 }))
+        .filter(m => m.val <= Number.MAX_SAFE_INTEGER);
+      // Map pitch based on exponent order
+      return known.map((m, i) => ({
+        val: m.val, p: m.p, kind: 'mersenne',
+        freq: PENTATONIC[Math.round((i / Math.max(1, known.length - 1)) * (PENTATONIC.length - 1))]
+      }));
+    }
+    case 'collatz': {
+      let n = Math.max(2, Math.min(999, collatzSeed || 27));
+      const path = [n];
+      while (n !== 1 && path.length < 2000) {
+        n = (n % 2 === 0) ? n / 2 : 3 * n + 1;
+        path.push(n);
+      }
+      const maxVal = Math.max(...path);
+      return path.map((v, i) => ({
+        val: v, kind: 'collatz', step: i,
+        freq: freqFromValue(v, 1, maxVal)
+      }));
+    }
+    default:
+      return [];
+  }
+}
+
+// ─── Canvas drawing ───────────────────────────────────────────────────────
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+window.addEventListener('resize', resizeCanvas);
+
+function draw() {
+  const W = canvas.getBoundingClientRect().width;
+  const H = canvas.getBoundingClientRect().height;
+
+  // Paper background
+  ctx.fillStyle = '#faf6ec';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle ruled lines
+  ctx.strokeStyle = 'rgba(26,24,20,0.05)';
+  ctx.lineWidth = 0.5;
+  for (let y = 24; y < H; y += 24) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  const mode = state.mode;
+  const seq = state.seqData;
+  const pos = state.seqPos;
+
+  if (mode === 'sieve') {
+    drawSieve(W, H, seq, pos);
+  } else if (mode === 'collatz') {
+    drawCollatz(W, H, seq, pos);
+  } else if (mode === 'mersenne') {
+    drawMersenne(W, H, seq, pos);
+  } else if (mode === 'prime-gaps') {
+    drawBars(W, H, seq, pos, v => v, 'gap');
+  } else if (mode === 'goldbach') {
+    drawGoldbach(W, H, seq, pos);
+  } else {
+    drawDefault(W, H, seq, pos);
+  }
+}
+
+function drawDefault(W, H, seq, pos) {
+  if (!seq.length) return;
+  const n = seq.length;
+  const barW = Math.max(1, Math.floor((W - 40) / n));
+  const totalW = barW * n;
+  const startX = (W - totalW) / 2;
+
+  for (let i = 0; i < n; i++) {
+    const ev = seq[i];
+    const x = startX + i * barW;
+    const t = ev.freq / PENTATONIC[PENTATONIC.length - 1];
+    const barH = Math.round(t * (H - 40)) + 4;
+    const y = H - barH - 10;
+
+    if (i < pos) {
+      ctx.fillStyle = ev.kind === 'composite'
+        ? 'rgba(84,73,58,0.45)'
+        : 'rgba(26,24,20,0.72)';
+    } else if (i === pos - 1) {
+      ctx.fillStyle = '#b88c2a';
+    } else {
+      ctx.fillStyle = 'rgba(26,24,20,0.12)';
+    }
+
+    ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+  }
+}
+
+function drawBars(W, H, seq, pos, valFn, kind) {
+  if (!seq.length) return;
+  const n = seq.length;
+  const barW = Math.max(1, Math.floor((W - 40) / n));
+  const totalW = barW * n;
+  const startX = (W - totalW) / 2;
+  const maxVal = Math.max(...seq.map(e => valFn(e)));
+
+  for (let i = 0; i < n; i++) {
+    const ev = seq[i];
+    const x = startX + i * barW;
+    const v = valFn(ev);
+    const barH = Math.round((v / maxVal) * (H - 40)) + 2;
+    const y = H - barH - 10;
+
+    if (i < pos) {
+      ctx.fillStyle = i === pos - 1 ? '#b88c2a' : 'rgba(42,80,144,0.65)';
+    } else {
+      ctx.fillStyle = 'rgba(26,24,20,0.12)';
+    }
+    ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+
+    // Gap value label for small sequences
+    if (n <= 60 && i < pos && barH > 14) {
+      ctx.fillStyle = '#f6f2e9';
+      ctx.font = '9px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(v), x + barW / 2, H - 14);
+    }
+  }
+}
+
+function drawSieve(W, H, seq, pos) {
+  const nLimit = state.nLimit;
+  const cols = Math.max(10, Math.floor(W / 28));
+  const cellW = Math.floor(W / cols);
+  const cellH = 22;
+
+  // Build state: which numbers are crossed and which are confirmed prime
+  const crossed = new Set();
+  const confirmed = new Set();
+  for (let i = 0; i < pos && i < seq.length; i++) {
+    const ev = seq[i];
+    if (ev.kind === 'sieve-cross') crossed.add(ev.val);
+    else if (ev.kind === 'sieve-prime') confirmed.add(ev.val);
+  }
+
+  for (let n = 2; n <= nLimit; n++) {
+    const col = (n - 2) % cols;
+    const row = Math.floor((n - 2) / cols);
+    const x = col * cellW;
+    const y = row * cellH + 4;
+
+    if (y + cellH > H - 4) break;
+
+    if (crossed.has(n)) {
+      ctx.fillStyle = 'rgba(168,60,38,0.08)';
+      ctx.fillRect(x, y, cellW - 1, cellH - 1);
+      ctx.strokeStyle = 'rgba(168,60,38,0.3)';
+      ctx.lineWidth = 0.5;
+      // Cross-out line
+      ctx.beginPath();
+      ctx.moveTo(x + 2, y + cellH / 2);
+      ctx.lineTo(x + cellW - 3, y + cellH / 2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(168,60,38,0.35)';
+    } else if (confirmed.has(n)) {
+      ctx.fillStyle = 'rgba(184,140,42,0.18)';
+      ctx.fillRect(x, y, cellW - 1, cellH - 1);
+      ctx.fillStyle = '#1a1814';
+    } else {
+      ctx.fillStyle = 'rgba(26,24,20,0.06)';
+    }
+
+    // Current event highlight
+    const curEv = seq[pos - 1];
+    if (curEv && curEv.val === n) {
+      ctx.fillStyle = '#1a1814';
+      ctx.fillRect(x, y, cellW - 1, cellH - 1);
+      ctx.fillStyle = '#f6f2e9';
+    }
+
+    ctx.font = `${Math.min(12, cellW - 6)}px IBM Plex Mono, monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText(String(n), x + cellW / 2, y + cellH - 6);
+  }
+}
+
+function drawCollatz(W, H, seq, pos) {
+  if (!seq.length) return;
+  const maxVal = Math.max(...seq.map(e => e.val));
+  const n = seq.length;
+  const margin = 30;
+  const plotW = W - margin * 2;
+  const plotH = H - margin * 2;
+
+  // Draw full path faintly
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const x = margin + (i / (n - 1)) * plotW;
+    const y = margin + (1 - seq[i].val / maxVal) * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = 'rgba(26,24,20,0.1)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Draw played portion
+  if (pos > 1) {
+    ctx.beginPath();
+    for (let i = 0; i < pos; i++) {
+      const x = margin + (i / (n - 1)) * plotW;
+      const y = margin + (1 - seq[i].val / maxVal) * plotH;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = '#1a1814';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Current point
+  if (pos > 0) {
+    const i = pos - 1;
+    const x = margin + (i / Math.max(1, n - 1)) * plotW;
+    const y = margin + (1 - seq[i].val / maxVal) * plotH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#b88c2a';
+    ctx.fill();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(26,24,20,0.25)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(margin, margin); ctx.lineTo(margin, H - margin); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(margin, H - margin); ctx.lineTo(W - margin, H - margin); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = 'rgba(26,24,20,0.4)';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText(String(maxVal), margin - 3, margin + 4);
+  ctx.fillText('1', margin - 3, H - margin);
+  ctx.textAlign = 'left';
+  ctx.fillText('step 0', margin, H - margin + 12);
+  ctx.textAlign = 'right';
+  ctx.fillText('step ' + (n - 1), W - margin, H - margin + 12);
+}
+
+function drawMersenne(W, H, seq, pos) {
+  if (!seq.length) return;
+  // Show each Mersenne prime as a column with its exponent
+  const n = seq.length;
+  const colW = Math.floor((W - 60) / n);
+  const startX = 30;
+
+  for (let i = 0; i < n; i++) {
+    const ev = seq[i];
+    const x = startX + i * colW;
+    const t = i / (n - 1);
+    const barH = Math.round(t * (H - 60)) + 20;
+    const y = H - barH - 20;
+
+    ctx.fillStyle = i < pos
+      ? (i === pos - 1 ? '#a83c26' : 'rgba(26,24,20,0.7)')
+      : 'rgba(26,24,20,0.1)';
+    ctx.fillRect(x, y, Math.max(colW - 4, 4), barH);
+
+    // Label: 2^p - 1
+    ctx.fillStyle = i < pos ? 'rgba(26,24,20,0.7)' : 'rgba(26,24,20,0.25)';
+    ctx.font = '9px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('2^' + ev.p + '-1', x + colW / 2, y - 4);
+  }
+}
+
+function drawGoldbach(W, H, seq, pos) {
+  if (!seq.length) return;
+  const n = seq.length;
+  const margin = 30;
+  const plotW = W - margin * 2;
+  const plotH = H - margin * 2;
+  const maxN = seq[n - 1] ? seq[n - 1].n : 4;
+
+  // Draw p and q as stacked bars for each even n
+  const barW = Math.max(1, Math.floor(plotW / n));
+  for (let i = 0; i < n; i++) {
+    const ev = seq[i];
+    const x = margin + i * barW;
+    const pRatio = ev.val / ev.n;
+    const qRatio = ev.val2 / ev.n;
+    const totalH = plotH;
+
+    if (i < pos) {
+      // p (lower)
+      const pH = Math.round(pRatio * totalH);
+      ctx.fillStyle = i === pos - 1 ? '#b88c2a' : 'rgba(26,24,20,0.65)';
+      ctx.fillRect(x, H - margin - pH, Math.max(1, barW - 1), pH);
+      // q (upper, different shade)
+      const qH = Math.round(qRatio * totalH);
+      ctx.fillStyle = i === pos - 1 ? '#a83c26' : 'rgba(74,112,48,0.65)';
+      ctx.fillRect(x, H - margin - pH - qH, Math.max(1, barW - 1), qH);
+    } else {
+      ctx.fillStyle = 'rgba(26,24,20,0.07)';
+      ctx.fillRect(x, margin, Math.max(1, barW - 1), plotH);
+    }
+  }
+
+  // Axis
+  ctx.strokeStyle = 'rgba(26,24,20,0.2)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(margin, H - margin); ctx.lineTo(W - margin, H - margin); ctx.stroke();
+}
+
+// ─── Scroll ticker ─────────────────────────────────────────────────────────
+function buildScrollTicker(seq, pos, nLimit, mode) {
+  const inner = $('scroll-inner');
+  inner.innerHTML = '';
+
+  if (mode === 'mersenne' || mode === 'collatz') {
+    // For these modes, show the sequence values
+    const slice = seq.slice(Math.max(0, pos - 20), pos + 20);
+    slice.forEach((ev, si) => {
+      const i = Math.max(0, pos - 20) + si;
+      const span = document.createElement('span');
+      span.className = 'tick-num';
+      span.textContent = ev.kind === 'mersenne' ? ('2^' + ev.p + '-1') : String(ev.val);
+      if (i === pos - 1) span.classList.add('current');
+      else if (ev.kind === 'mersenne' && i < pos) span.classList.add('mersenne');
+      inner.appendChild(span);
+    });
+    return;
+  }
+
+  // For number-based modes: show a window of integers around current
+  const sieve = buildSieve(nLimit);
+  const current = seq[pos - 1] ? seq[pos - 1].val : null;
+  const start = Math.max(2, (current || 2) - 25);
+  const end = Math.min(nLimit, start + 60);
+
+  for (let n = start; n <= end; n++) {
+    const span = document.createElement('span');
+    span.className = 'tick-num';
+    span.textContent = String(n);
+    if (n === current) span.classList.add('current');
+    else if (sieve[n]) span.classList.add('prime');
+    inner.appendChild(span);
+  }
+}
+
+// ─── UI update ─────────────────────────────────────────────────────────────
+function updateUI() {
+  const pos = state.seqPos;
+  const seq = state.seqData;
+  const ev = seq[pos - 1];
+
+  $('m-step').textContent = pos;
+  $('m-count').textContent = seq.length;
+  $('m-status').textContent = state.running ? 'playing' : (pos >= seq.length ? 'done' : 'paused');
+
+  if (ev) {
+    let cur = '';
+    if (ev.kind === 'gap') cur = 'gap=' + ev.val + ' (p=' + ev.label + ')';
+    else if (ev.kind === 'twin') cur = '(' + ev.val + ', ' + ev.val2 + ')';
+    else if (ev.kind === 'goldbach') cur = ev.n + '=' + ev.val + '+' + ev.val2;
+    else if (ev.kind === 'mersenne') cur = '2^' + ev.p + '-1';
+    else if (ev.kind === 'sieve-cross') cur = 'cross ' + ev.val;
+    else if (ev.kind === 'sieve-prime') cur = 'prime ' + ev.val;
+    else cur = String(ev.val);
+    $('m-current').textContent = cur;
+    $('np-id').textContent = 'n = ' + pos;
+  } else {
+    $('m-current').textContent = '—';
+  }
+
+  buildScrollTicker(seq, pos, state.nLimit, state.mode);
+  draw();
+}
+
+// ─── Step ──────────────────────────────────────────────────────────────────
+function step() {
+  const seq = state.seqData;
+  if (state.seqPos >= seq.length) {
+    stop();
+    return;
+  }
+
+  const ev = seq[state.seqPos];
+  state.seqPos++;
+
+  ensureAudio();
+
+  // Play audio based on kind
+  switch (ev.kind) {
+    case 'prime':
+      playTone(ev.freq, 'sine', 0.14, 1.0);
+      break;
+    case 'composite':
+      playTone(ev.freq, 'square', 0.06, 0.45);
+      break;
+    case 'twin': {
+      // Two plucks with brief delay
+      playTone(ev.freq, 'sine', 0.15, 0.9);
+      const ac = state.audioCtx;
+      if (ac) {
+        const now = ac.currentTime + 0.06;
+        const osc = ac.createOscillator();
+        const g = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(ev.freq2, now);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(state.volume * 0.32, now + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(g).connect(ac.destination);
+        osc.start(now); osc.stop(now + 0.16);
+      }
+      break;
+    }
+    case 'gap':
+      playTone(ev.freq, 'sine', 0.18, 1.0);
+      break;
+    case 'goldbach': {
+      // p then q in quick succession
+      playTone(ev.freq, 'sine', 0.12, 0.9);
+      const ac2 = state.audioCtx;
+      if (ac2) {
+        const now2 = ac2.currentTime + 0.08;
+        const osc2 = ac2.createOscillator();
+        const g2 = ac2.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(ev.freq2, now2);
+        g2.gain.setValueAtTime(0, now2);
+        g2.gain.linearRampToValueAtTime(state.volume * 0.30, now2 + 0.008);
+        g2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.13);
+        osc2.connect(g2).connect(ac2.destination);
+        osc2.start(now2); osc2.stop(now2 + 0.14);
+      }
+      break;
+    }
+    case 'sieve-prime':
+      playTone(ev.freq, 'sine', 0.16, 1.0);
+      break;
+    case 'sieve-cross':
+      playClick();
+      break;
+    case 'mersenne':
+      // Deep sustained bass tone
+      playTone(ev.freq, 'sine', 0.9, 1.0);
+      // Add a triangle wave for warmth
+      if (state.audioCtx) {
+        const ac3 = state.audioCtx;
+        const now3 = ac3.currentTime;
+        const osc3 = ac3.createOscillator();
+        const g3 = ac3.createGain();
+        osc3.type = 'triangle';
+        osc3.frequency.setValueAtTime(ev.freq * 0.5, now3);
+        g3.gain.setValueAtTime(0, now3);
+        g3.gain.linearRampToValueAtTime(state.volume * 0.15, now3 + 0.02);
+        g3.gain.exponentialRampToValueAtTime(0.001, now3 + 1.2);
+        osc3.connect(g3).connect(ac3.destination);
+        osc3.start(now3); osc3.stop(now3 + 1.25);
+      }
+      break;
+    case 'collatz':
+      playTone(ev.freq, 'sine', 0.09, 0.8);
+      break;
+  }
+
+  updateUI();
+}
+
+function stop() {
+  state.running = false;
+  if (state.timerId !== null) { clearInterval(state.timerId); state.timerId = null; }
+  $('play-btn').textContent = 'Play';
+  $('m-status').textContent = state.seqPos >= state.seqData.length ? 'done' : 'paused';
+}
+
+function play() {
+  if (state.seqPos >= state.seqData.length) resetSeq();
+  state.running = true;
+  $('play-btn').textContent = 'Pause';
+  $('m-status').textContent = 'playing';
+  state.timerId = setInterval(() => {
+    if (state.seqPos >= state.seqData.length) { stop(); return; }
+    step();
+  }, state.stepMs);
+}
+
+function resetSeq() {
+  stop();
+  state.seqPos = 0;
+  const collatzSeed = parseInt($('collatz-seed').value, 10) || 27;
+  state.seqData = buildSequence(state.mode, state.nLimit, collatzSeed);
+  updateUI();
+}
+
+// ─── Mode switch ───────────────────────────────────────────────────────────
+function switchMode(mode) {
+  stop();
+  state.mode = mode;
+
+  // Update sidebar
+  document.querySelectorAll('#mode-list li').forEach(li => {
+    li.classList.toggle('active', li.dataset.mode === mode);
+  });
+
+  // Update now-playing header
+  const meta = MODE_META[mode];
+  $('np-name').textContent = meta.name;
+  $('np-id').textContent = meta.id;
+  $('np-note').textContent = meta.note;
+
+  // Show/hide collatz row
+  $('collatz-row').classList.toggle('visible', mode === 'collatz');
+
+  resetSeq();
+}
+
+// ─── Event listeners ───────────────────────────────────────────────────────
+document.querySelectorAll('#mode-list li').forEach(li => {
+  li.addEventListener('click', () => switchMode(li.dataset.mode));
+});
+
+$('play-btn').addEventListener('click', () => {
+  if (state.running) stop(); else play();
+});
+
+$('reset-btn').addEventListener('click', resetSeq);
+
+$('mute-btn').addEventListener('click', () => {
+  state.muted = !state.muted;
+  $('mute-btn').classList.toggle('active', state.muted);
+  $('mute-btn').textContent = state.muted ? 'Unmute' : 'Mute';
+});
+
+$('speed').addEventListener('input', () => {
+  state.stepMs = parseInt($('speed').value, 10);
+  $('speed-val').textContent = state.stepMs;
+  if (state.running) { stop(); play(); }
+});
+
+$('volume').addEventListener('input', () => {
+  state.volume = parseInt($('volume').value, 10) / 100;
+  $('volume-val').textContent = $('volume').value;
+});
+
+$('n-limit').addEventListener('change', () => {
+  const v = parseInt($('n-limit').value, 10);
+  state.nLimit = Math.max(10, Math.min(1000, v || 200));
+  $('n-limit').value = state.nLimit;
+  resetSeq();
+});
+
+$('collatz-seed').addEventListener('change', () => {
+  if (state.mode === 'collatz') resetSeq();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); if (state.running) stop(); else play(); }
+  if (e.code === 'KeyR') resetSeq();
+  if (e.code === 'KeyM') $('mute-btn').click();
+});
+
+// ─── Verification (dev sanity-check, console only) ────────────────────────
+(function verifyPrimes() {
+  const s = buildSieve(1000);
+  const primes = [];
+  for (let i = 2; i <= 1000; i++) { if (s[i]) primes.push(i); }
+  if (primes.length !== 168) console.error('Prime count mismatch: expected 168, got', primes.length);
+
+  let twins = 0;
+  for (let i = 0; i < primes.length - 1; i++) {
+    if (primes[i + 1] - primes[i] === 2) twins++;
+  }
+  if (twins !== 35) console.error('Twin prime count mismatch: expected 35, got', twins);
+})();
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+(function init() {
+  resizeCanvas();
+  state.nLimit = parseInt($('n-limit').value, 10) || 200;
+  state.stepMs = parseInt($('speed').value, 10) || 200;
+  state.volume = parseInt($('volume').value, 10) / 100;
+  state.seqData = buildSequence('primes', state.nLimit, 27);
+  updateUI();
+})();
+
+})();
+</script>
+</body>
+</html>
