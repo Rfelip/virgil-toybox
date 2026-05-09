@@ -246,6 +246,38 @@ body {
   text-align: left;
 }
 
+/* ---------- Tables ---------- */
+.gazette-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.9rem;
+  break-inside: avoid;
+}
+
+.gazette-table thead {
+  background: var(--paper-dark);
+  border-bottom: 2px solid var(--ink-mid);
+}
+
+.gazette-table th {
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-mid);
+  font-size: 0.9rem;
+}
+
+.gazette-table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+
+.gazette-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 /* ---------- Code ---------- */
 .gazette-code-inline {
   font-family: var(--mono-font);

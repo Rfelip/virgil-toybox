@@ -78,14 +78,15 @@ def inline_md(text: str) -> str:
 
 class Token:
     """A parsed block token."""
-    __slots__ = ('kind', 'level', 'text', 'items', 'lang')
+    __slots__ = ('kind', 'level', 'text', 'items', 'lang', 'rows')
 
-    def __init__(self, kind, text='', level=0, items=None, lang=''):
-        self.kind = kind    # h1|h2|h3|p|blockquote|list|fenced_code|hr|blank
+    def __init__(self, kind, text='', level=0, items=None, lang='', rows=None):
+        self.kind = kind    # h1|h2|h3|p|blockquote|list|fenced_code|hr|blank|table
         self.text = text
         self.level = level
         self.items = items or []
         self.lang = lang
+        self.rows = rows or []  # for tables: list of list of cells
 
 
 def tokenize(source: str) -> list:
@@ -108,6 +109,27 @@ def tokenize(source: str) -> list:
 
     while i < len(lines):
         line = lines[i]
+
+        # Markdown table (detect by separator row: |---|---|...)
+        if i + 1 < len(lines) and re.match(r'^\|', line):
+            # Look ahead for separator
+            peek_line = lines[i + 1]
+            if re.match(r'^\|?\s*-+\s*\|', peek_line):
+                # This is a table header row
+                flush_list()
+                table_rows = []
+                # Parse header
+                header_cells = [c.strip() for c in line.split('|')[1:-1]]
+                table_rows.append(header_cells)
+                # Skip separator
+                i += 2
+                # Parse data rows until non-pipe line
+                while i < len(lines) and re.match(r'^\|', lines[i]):
+                    row_cells = [c.strip() for c in lines[i].split('|')[1:-1]]
+                    table_rows.append(row_cells)
+                    i += 1
+                tokens.append(Token('table', rows=table_rows))
+                continue
 
         # Fenced code block
         if re.match(r'^```', line):
@@ -146,6 +168,8 @@ def tokenize(source: str) -> list:
             flush_list()
             level = len(m.group(1))
             text = m.group(2).strip()
+            # Strip Obsidian-style attributes like { .class }
+            text = re.sub(r'\s*\{\s*\.[\w\-]+\s*\}\s*$', '', text)
             if level == 1:
                 tokens.append(Token('h1', text=text, level=1))
             elif level == 2:
@@ -165,12 +189,18 @@ def tokenize(source: str) -> list:
             i += 1
             continue
 
-        # List item
-        m = re.match(r'^[-*+]\s+(.*)', line)
+        # List item (bullet or numbered: -, *, +, or 1., 2., etc.)
+        m = re.match(r'^(?:[-*+]|\d+\.)\s+(.*)', line)
         if m:
             in_list = True
-            list_items.append(m.group(1))
+            # Collect full item including continuation lines (indented)
+            item_text = m.group(1)
             i += 1
+            # Continuation lines start with whitespace
+            while i < len(lines) and lines[i].startswith(('  ', '\t')) and lines[i].strip():
+                item_text += ' ' + lines[i].strip()
+                i += 1
+            list_items.append(item_text)
             continue
 
         # Blank line
@@ -195,6 +225,30 @@ def tokenize(source: str) -> list:
     return tokens
 
 
+def render_table(rows: list) -> str:
+    """Render a markdown table to HTML. rows is list of list of cell strings."""
+    if not rows:
+        return ''
+    html = '<table class="gazette-table">\n'
+    # Header row (first row)
+    if rows:
+        html += '<thead><tr>\n'
+        for cell in rows[0]:
+            html += f'  <th>{inline_md(cell)}</th>\n'
+        html += '</tr></thead>\n'
+    # Data rows (remaining rows)
+    if len(rows) > 1:
+        html += '<tbody>\n'
+        for row in rows[1:]:
+            html += '<tr>\n'
+            for cell in row:
+                html += f'  <td>{inline_md(cell)}</td>\n'
+            html += '</tr>\n'
+        html += '</tbody>\n'
+    html += '</table>\n'
+    return html
+
+
 def render_blockquote(text: str) -> str:
     """Render blockquote text as a pull-quote block. Handles multi-para."""
     parts = [p.strip() for p in text.split('\n\n') if p.strip()]
@@ -213,6 +267,8 @@ def render_token(token: Token) -> str:
     elif token.kind == 'list':
         items_html = ''.join(f'<li>{inline_md(item)}</li>\n' for item in token.items)
         return f'<ul class="gazette-list">\n{items_html}</ul>\n'
+    elif token.kind == 'table':
+        return render_table(token.rows)
     elif token.kind == 'fenced_code':
         escaped = escape_html(token.text)
         lang_class = f' class="language-{token.lang}"' if token.lang else ''
