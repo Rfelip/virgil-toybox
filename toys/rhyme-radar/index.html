@@ -35,14 +35,33 @@
       <span class="seed-hint" id="seed-hint">loading dictionary…</span>
     </form>
 
-    <div class="radar-wrap">
-      <canvas id="radar-canvas" width="900" height="900" aria-hidden="true"></canvas>
-      <div class="legend" aria-label="Legend">
-        <span class="legend-item legend-perfect">perfect</span>
-        <span class="legend-item legend-near">near</span>
-        <span class="legend-item legend-assonance">assonance</span>
-        <span class="legend-item legend-consonance">consonance</span>
+    <div class="radar-main-wrap">
+      <div class="radar-wrap">
+        <canvas id="radar-canvas" width="900" height="900" aria-hidden="true"></canvas>
+        <div class="legend" aria-label="Legend">
+          <span class="legend-item legend-perfect">perfect</span>
+          <span class="legend-item legend-near">near</span>
+          <span class="legend-item legend-assonance">assonance</span>
+          <span class="legend-item legend-consonance">consonance</span>
+        </div>
       </div>
+
+      <aside class="radar-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">filters</div>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="perfect">perfect</button>
+            <button class="filter-btn active" data-filter="near">near</button>
+            <button class="filter-btn active" data-filter="assonance">assonance</button>
+            <button class="filter-btn active" data-filter="consonance">consonance</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">history</div>
+          <ol class="history-list" id="history-list"></ol>
+        </div>
+      </aside>
     </div>
 
     <nav class="breadcrumb" aria-label="Visited path">

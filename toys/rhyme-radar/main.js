@@ -38,10 +38,10 @@ const RINGS = [
   { name: "consonance", radius: 410, color: "#a07a7a", cap: 24, label: "consonance" },
 ];
 
-const INK = "#2d3a5f";
-const INK_MUTE = "#5a668a";
-const INK_GHOST = "#8a94b2";
-const PAPER_SHADE = "rgba(138, 148, 178, 0.18)";
+const INK = "#1a1814";
+const INK_MUTE = "#6a5a48";
+const INK_GHOST = "#a89a7a";
+const PAPER_SHADE = "rgba(180, 160, 120, 0.15)";
 
 const ANIMATION_MS = 750;
 
@@ -79,6 +79,12 @@ let layoutSeed = 0;
  * rebuilt on every draw, so an index would point at stale or partial data.
  */
 let hovered = null;
+
+/** @type {string[]} — recent lookup history (up to 5 words) */
+let lookupHistory = [];
+
+/** @type {Set<string>} — active filter rings (all start active) */
+let activeFilters = new Set(["perfect", "near", "assonance", "consonance"]);
 
 // ------------------------------------------------------------------
 // Canvas setup
@@ -167,9 +173,12 @@ function draw() {
 
   const rand = mulberry32(layoutSeed);
 
-  // Draw each ring's words
+  // Draw each ring's words (respecting active filters)
   for (let i = 0; i < RINGS.length; i++) {
     const ring = RINGS[i];
+    // Skip this ring if its filter is not active
+    if (!activeFilters.has(ring.name)) continue;
+
     const words = currentRings[ring.name] || [];
     if (words.length === 0) continue;
 
@@ -544,6 +553,9 @@ function setSeed(word) {
   currentRings = capRings(result.rings, 30);
   layoutSeed = hashString(word);
 
+  // Update history
+  updateHistory(word);
+
   // Update the breadcrumb path — don't duplicate consecutive entries
   if (path[path.length - 1] !== word) {
     path.push(word);
@@ -585,6 +597,35 @@ function renderBreadcrumb() {
     if (i === path.length - 1) li.classList.add("current");
     li.addEventListener("click", () => setSeed(word));
     list.appendChild(li);
+  });
+}
+
+function updateHistory(word) {
+  // Add to history, remove if already present (move to top)
+  lookupHistory = lookupHistory.filter(w => w !== word);
+  lookupHistory.unshift(word);
+  if (lookupHistory.length > 5) lookupHistory.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById("history-list");
+  if (!list) return;
+  list.innerHTML = "";
+  lookupHistory.forEach((word) => {
+    const li = document.createElement("li");
+    li.className = "history-item";
+    li.textContent = word;
+    li.addEventListener("click", () => setSeed(word));
+    list.appendChild(li);
+  });
+}
+
+function updateFilterButtons() {
+  const buttons = document.querySelectorAll(".filter-btn");
+  buttons.forEach((btn) => {
+    const filter = btn.dataset.filter;
+    btn.classList.toggle("active", activeFilters.has(filter));
   });
 }
 
@@ -899,6 +940,28 @@ async function exportPathAsPoem() {
 }
 
 // ------------------------------------------------------------------
+// Rhyme of the day
+// ------------------------------------------------------------------
+//
+// A fixed pool of interesting seed words. One is picked on load
+// based on the date, so the same word appears throughout the day.
+
+const WORDS_OF_THE_DAY = [
+  "silence", "echo", "moon", "whisper", "silence",
+  "twilight", "wandering", "forgotten", "dancing",
+  "autumn", "distance", "breath", "shadow", "light",
+  "threshold", "memory", "spiral", "infinite",
+  "garden", "current", "soaring", "crystal",
+];
+
+function pickRhymeOfTheDay() {
+  const now = new Date();
+  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  const idx = seed % WORDS_OF_THE_DAY.length;
+  return WORDS_OF_THE_DAY[idx];
+}
+
+// ------------------------------------------------------------------
 // Boot
 // ------------------------------------------------------------------
 
@@ -914,8 +977,27 @@ async function boot() {
       audioBtn.addEventListener("click", toggleAudio);
     }
 
-    setSeed("silence");
-    seedInput.value = "silence";
+    // Wire filter buttons
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const filter = btn.dataset.filter;
+        if (activeFilters.has(filter)) {
+          activeFilters.delete(filter);
+        } else {
+          activeFilters.add(filter);
+        }
+        updateFilterButtons();
+        // Re-render the current seed with new filters
+        if (currentSeed) {
+          draw();
+        }
+      });
+    });
+
+    const seedWord = pickRhymeOfTheDay();
+    setSeed(seedWord);
+    seedInput.value = seedWord;
     seedInput.focus();
   } catch (err) {
     console.error(err);
