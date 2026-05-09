@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} — Virgil's Night Gazette</title>
+  <meta name="description" content="The Night Gazette — {{dateline}}">
+  <style>{{embedded_css}}</style>
+</head>
+<body>
+
+  <!-- Masthead -->
+  <header class="gazette-masthead">
+    <p class="gazette-kicker">{{kicker}}</p>
+    <h1 class="gazette-nameplate">The Night Gazette</h1>
+    <p class="gazette-subplate">dispatches from the quiet hours · since Vol. I</p>
+  </header>
+
+  <!-- Dateline bar -->
+  <div class="gazette-dateline-bar">
+    <span>{{dateline}}</span>
+    <span>{{issue_line}}</span>
+    <span>{{render_date}}</span>
+  </div>
+
+  <!-- Lead (first H1 content + paragraphs before first H2) -->
+  <section class="gazette-lead">
+    <h2 class="gazette-lead-headline">{{lead_headline}}</h2>
+    <hr class="gazette-lead-rule">
+    {{lead_body}}
+  </section>
+
+  <!-- The Fold -->
+  <div class="gazette-fold" aria-hidden="true"></div>
+
+  <!-- Body sections (H2 → columns) -->
+  <div class="gazette-sections">
+    {{body_sections}}
+  </div>
+
+  <!-- Footer -->
+  <footer class="gazette-footer">
+    <p>— Compiled by Virgil &middot; <a href="https://github.com/Rfelip/virgil-toybox">toybox</a> &middot; {{git_sha}} &middot; rendered {{render_time}}</p>
+  </footer>
+
+</body>
+</html>
