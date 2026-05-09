@@ -117,6 +117,63 @@
 
       <div class="card-grid">
 
+        <a class="toy-card" href="toys/2026-05-09-bichromator-concrete/">
+          <div class="toy-card-art" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="14" width="88" height="72" fill="#f6f2e9" stroke="#2a2419" stroke-width="0.8" />
+              <!-- Gradient bar showing concrete-to-abstract spectrum -->
+              <defs>
+                <linearGradient id="conc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#c45c18" />
+                  <stop offset="50%" stop-color="#b09060" />
+                  <stop offset="100%" stop-color="#2a5fa8" />
+                </linearGradient>
+              </defs>
+              <rect x="14" y="24" width="72" height="5" rx="1" fill="url(#conc-grad)" />
+              <!-- Words colored by concreteness, two lines -->
+              <g font-family="'EB Garamond', Georgia, serif" font-size="5.2">
+                <!-- Line 1: concrete words -->
+                <text x="14" y="38" fill="#c45c18">rock</text>
+                <text x="26" y="38" fill="#c96820">hand</text>
+                <text x="40" y="38" fill="#b87838">smoke</text>
+                <text x="57" y="38" fill="#9a7850">river</text>
+                <text x="71" y="38" fill="#7a6868">rain</text>
+                <!-- Line 2: abstract words -->
+                <text x="14" y="52" fill="#6a6078">beauty</text>
+                <text x="34" y="52" fill="#526088">freedom</text>
+                <text x="56" y="52" fill="#3a5898">meaning</text>
+                <text x="76" y="52" fill="#2a5fa8">idea</text>
+              </g>
+              <!-- Mean marker concept: a vertical rule + label -->
+              <line x1="50" y1="59" x2="50" y2="73" stroke="#2b2722" stroke-width="0.6" stroke-dasharray="1,1" />
+              <text x="50" y="80" text-anchor="middle" font-family="'EB Garamond', Georgia, serif" font-size="3.4" fill="#5a4a30" font-style="italic">mean: 2.98</text>
+              <!-- Histogram bars at bottom -->
+              <g fill="rgba(42,31,22,0.18)">
+                <rect x="16" y="66" width="4" height="6" />
+                <rect x="22" y="62" width="4" height="10" />
+                <rect x="28" y="58" width="4" height="14" />
+                <rect x="34" y="61" width="4" height="11" />
+                <rect x="40" y="64" width="4" height="8" />
+                <rect x="46" y="63" width="4" height="9" />
+                <rect x="52" y="67" width="4" height="5" />
+                <rect x="58" y="65" width="4" height="7" />
+              </g>
+            </svg>
+          </div>
+          <div class="toy-card-body">
+            <h3 class="card-title">Bichromator: Concrete</h3>
+            <p class="card-sub">Brysbaert concreteness in prose</p>
+            <p class="card-blurb">
+              Paste English prose; each word is colored by its position on the
+              concrete&ndash;abstract continuum using Brysbaert et al.&rsquo;s
+              37,058-word norms. Warm terracotta for rock and hand; cool cerulean
+              for freedom and meaning. Histogram, mean marker, and corpus
+              calibration against McCarthy, news, philosophy, and legal text.
+            </p>
+            <span class="card-cta">open&nbsp;&rsaquo;</span>
+          </div>
+        </a>
+
         <a class="toy-card" href="toys/2026-05-09-lantern-keeper/">
           <div class="toy-card-art" aria-hidden="true">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
