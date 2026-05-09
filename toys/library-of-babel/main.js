@@ -1,10 +1,11 @@
 // Library of Babel — UI layer.
 // Engine + page generation lives in engine.js. This file handles DOM,
-// keyboard, the librarian's behavior, and bookmarks.
+// keyboard, the librarian's behavior, bookmarks, search, and galleries.
 
 import { LIBRARIAN_QUIPS } from "./fragments.js";
 import {
-  generatePage, formatCoord, parseCoord, neighbor, randomCoord,
+  generatePage, formatCoord, parseCoord, neighbor, randomCoord, searchCoord,
+  GALLERIES,
 } from "./engine.js";
 
 // =====================================================================
@@ -59,7 +60,7 @@ const Librarian = {
   lastPageAt: 0,   // when current page was opened
 
   // Decide whether and what to say. Returns string or null.
-  consider(kind /* "navigate"|"random"|"teleport"|"bookmark"|"linger"|"first" */) {
+  consider(kind /* "navigate"|"random"|"teleport"|"bookmark"|"linger"|"first"|"search"|"gallery" */) {
     const now = Date.now();
     this.history.push({ kind, t: now });
     if (this.history.length > 30) this.history.shift();
@@ -85,6 +86,14 @@ const Librarian = {
     if (kind === "linger") {
       this.lastSpoke = now;
       return pickFrom(LIBRARIAN_QUIPS.on_linger);
+    }
+    if (kind === "search") {
+      this.lastSpoke = now;
+      return pickFrom(LIBRARIAN_QUIPS.on_search);
+    }
+    if (kind === "gallery") {
+      this.lastSpoke = now;
+      return pickFrom(LIBRARIAN_QUIPS.on_gallery);
     }
     if (kind === "random") {
       if (Math.random() < 0.5) {
@@ -277,15 +286,63 @@ function renderCorkboard() {
 }
 
 // =====================================================================
+// Galleries
+// =====================================================================
+
+function renderGalleries() {
+  const list = $("gallery-list");
+  list.innerHTML = "";
+  for (const entry of GALLERIES) {
+    const li = document.createElement("li");
+    li.className = "gallery-item";
+
+    const titleEl = document.createElement("span");
+    titleEl.className = "gallery-item-title";
+    titleEl.textContent = entry.title;
+
+    const excerptEl = document.createElement("span");
+    excerptEl.className = "gallery-item-excerpt";
+    excerptEl.textContent = entry.excerpt;
+
+    const coordEl = document.createElement("span");
+    coordEl.className = "gallery-item-coord";
+    coordEl.textContent = formatCoord(entry.coord);
+
+    li.appendChild(titleEl);
+    li.appendChild(excerptEl);
+    li.appendChild(coordEl);
+
+    li.addEventListener("click", () => {
+      showRoom("reading");
+      navigate(entry.coord, "gallery");
+    });
+
+    list.appendChild(li);
+  }
+}
+
+// =====================================================================
 // Rooms
 // =====================================================================
+
+const ROOM_ORDER = ["reading", "galleries", "search", "corkboard"];
 
 function showRoom(name) {
   document.body.classList.toggle("reading-room-active", name === "reading");
   $("reading-room").classList.toggle("room-active", name === "reading");
+  $("reading-room").setAttribute("aria-hidden", name !== "reading" ? "true" : "false");
+  $("galleries").classList.toggle("room-active", name === "galleries");
+  $("galleries").setAttribute("aria-hidden", name !== "galleries" ? "true" : "false");
+  $("search-room").classList.toggle("room-active", name === "search");
+  $("search-room").setAttribute("aria-hidden", name !== "search" ? "true" : "false");
   $("corkboard").classList.toggle("room-active", name === "corkboard");
+  $("corkboard").setAttribute("aria-hidden", name !== "corkboard" ? "true" : "false");
+
   $("tab-reading").classList.toggle("tab-active", name === "reading");
+  $("tab-galleries").classList.toggle("tab-active", name === "galleries");
+  $("tab-search").classList.toggle("tab-active", name === "search");
   $("tab-corkboard").classList.toggle("tab-active", name === "corkboard");
+
   if (name === "corkboard") renderCorkboard();
 }
 
@@ -303,6 +360,7 @@ function init() {
   if (!coord) coord = { wing: 1, shelf: 1, volume: 1, page: 1 };
 
   renderPage(coord);
+  renderGalleries();
 
   // First-visit greeting (sparse — only if no bookmarks yet)
   if (loadBookmarks().length === 0) {
@@ -340,7 +398,40 @@ function init() {
 
   // Tabs
   $("tab-reading").addEventListener("click", () => showRoom("reading"));
+  $("tab-galleries").addEventListener("click", () => showRoom("galleries"));
+  $("tab-search").addEventListener("click", () => showRoom("search"));
   $("tab-corkboard").addEventListener("click", () => showRoom("corkboard"));
+
+  // Search form
+  $("search-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("search-input").value.trim();
+    if (!text) return;
+
+    const c = searchCoord(text);
+    if (!c) return;
+
+    const coordStr = formatCoord(c);
+    const resultEl = $("search-result");
+
+    // Show result with link to navigate
+    resultEl.innerHTML = "";
+    const prefix = document.createTextNode("Located at ");
+    const coordLink = document.createElement("span");
+    coordLink.className = "found-coord";
+    coordLink.textContent = coordStr;
+    coordLink.title = "navigate to this coordinate";
+    coordLink.addEventListener("click", () => {
+      showRoom("reading");
+      navigate(c, "search");
+    });
+    const suffix = document.createTextNode(". Click the coordinate to navigate there.");
+    resultEl.appendChild(prefix);
+    resultEl.appendChild(coordLink);
+    resultEl.appendChild(suffix);
+
+    speak(Librarian.consider("search"));
+  });
 
   // Help dialog
   $("help-toggle").addEventListener("click", () => $("help").showModal());
@@ -348,8 +439,8 @@ function init() {
 
   // Keyboard nav
   document.addEventListener("keydown", (e) => {
-    // Don't intercept while typing in the address bar.
-    if (e.target && e.target.id === "address-input") return;
+    // Don't intercept while typing in the address bar or search input.
+    if (e.target && (e.target.id === "address-input" || e.target.id === "search-input")) return;
     if (!currentPage) return;
 
     const c = currentPage.coord;
@@ -367,7 +458,13 @@ function init() {
     }
     else if (e.key === "Tab") {
       e.preventDefault();
-      const next = $("reading-room").classList.contains("room-active") ? "corkboard" : "reading";
+      // Cycle through rooms in order
+      const activeRoom =
+        $("reading-room").classList.contains("room-active") ? "reading" :
+        $("galleries").classList.contains("room-active")    ? "galleries" :
+        $("search-room").classList.contains("room-active")  ? "search" : "corkboard";
+      const idx = ROOM_ORDER.indexOf(activeRoom);
+      const next = ROOM_ORDER[(idx + 1) % ROOM_ORDER.length];
       showRoom(next);
       return;
     }
@@ -379,6 +476,10 @@ function init() {
 
     if (nc) {
       e.preventDefault();
+      // Navigate always takes us back to the reading room if we're elsewhere
+      if (!$("reading-room").classList.contains("room-active")) {
+        showRoom("reading");
+      }
       navigate(nc, kind);
     }
   });

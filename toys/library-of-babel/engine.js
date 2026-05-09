@@ -103,6 +103,80 @@ export function randomCoord(rng = Math.random) {
 }
 
 // =====================================================================
+// Search — locate a text string in address space.
+// By the first axiom, every possible text exists somewhere; this function
+// maps a phrase deterministically to a coordinate.
+// The result is not a search of existing pages — it is a placement.
+// =====================================================================
+
+export function searchCoord(text) {
+  if (!text || !text.trim()) return null;
+  const t = text.trim();
+  // Hash the text four times with independent seeds, one per coordinate axis.
+  // Each hash is forced to unsigned 32-bit to keep modulo arithmetic safe.
+  const h1 = cyrb53(t, 0)          >>> 0;
+  const h2 = cyrb53(t, 0x9e3779b9) >>> 0;
+  const h3 = cyrb53(t, 0xf1234567) >>> 0;
+  const h4 = cyrb53(t, 0x12345678) >>> 0;
+  return {
+    wing:   1 + (h1 % BOUNDS.wing.max),
+    shelf:  1 + (h2 % BOUNDS.shelf.max),
+    volume: 1 + (h3 % BOUNDS.volume.max),
+    page:   1 + (h4 % BOUNDS.page.max),
+  };
+}
+
+// =====================================================================
+// Galleries — curated coordinates that reward a visit.
+// Each entry includes a coord, a title, and an excerpt note.
+// The coord is chosen so the generated page has an evocative title;
+// since page content is deterministic, these are fixed attractions.
+// =====================================================================
+
+export const GALLERIES = [
+  {
+    coord: { wing: 1, shelf: 1, volume: 1, page: 1 },
+    title: "The Entrance",
+    excerpt: "The first page of the first volume on the first shelf of the first wing. Where every wandering begins.",
+  },
+  {
+    coord: searchCoord("the library of babel"),
+    title: "The Library Finds Itself",
+    excerpt: "The coordinate where the phrase 'the library of babel' is shelved, by the logic of placement.",
+  },
+  {
+    coord: searchCoord("Call me Ishmael"),
+    title: "A Famous Opening",
+    excerpt: "Somewhere in these stacks, among billions of volumes, Melville's first sentence has a permanent address.",
+  },
+  {
+    coord: searchCoord("In the beginning was the Word"),
+    title: "The Word",
+    excerpt: "The Gospel of John, first clause. It has always been here. We simply did not know where.",
+  },
+  {
+    coord: searchCoord("to be or not to be that is the question"),
+    title: "The Question",
+    excerpt: "Hamlet's soliloquy begins here, at least in one sense. The page will not disappoint you in the expected way.",
+  },
+  {
+    coord: { wing: 500, shelf: 20, volume: 50, page: 256 },
+    title: "The Centre, More or Less",
+    excerpt: "The approximate midpoint of the address space. No different from any other page, which is the point.",
+  },
+  {
+    coord: { wing: 1000, shelf: 40, volume: 100, page: 512 },
+    title: "The Far End",
+    excerpt: "The last page of the last volume on the last shelf of the last wing. Or the last we can reach.",
+  },
+  {
+    coord: searchCoord("I have been here before"),
+    title: "The Familiar Stranger",
+    excerpt: "The sentence every returned reader thinks on arrival. Found at last.",
+  },
+];
+
+// =====================================================================
 // Markov chain (order 2)
 // =====================================================================
 

@@ -198,6 +198,19 @@ export const LIBRARIAN_QUIPS = {
     "First time? Try pressing ? for the rules of the place.",
     "Don't be shy with the keyboard. The library prefers an active reader.",
   ],
+  on_search: [
+    "I was wondering when someone would try that.",
+    "Found it. It was here the whole time, of course.",
+    "The library doesn't hide things. It simply doesn't label them.",
+    "Every sentence has always had an address. Most people never look.",
+    "I shelved that one myself, years ago. I don't remember which year.",
+  ],
+  on_gallery: [
+    "A recommended stop. I've always thought so.",
+    "Ah. One of the curated rooms. They're not better than the others — just annotated.",
+    "I pointed a reader here once. She didn't say what she thought of it.",
+    "The galleries are just coordinates someone found worth keeping. Like any bookmark.",
+  ],
 };
 
 // === Page numbering helpers ===

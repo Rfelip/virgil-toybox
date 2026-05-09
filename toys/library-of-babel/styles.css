@@ -1,24 +1,27 @@
 /*
-  Library of Babel — cream night palette.
-  Sister to Rhyme Radar but dimmer; the library is open at night.
+  Library of Babel — warm off-white palette.
+  Sister to Rhyme Radar and the Night Gazette; letterpress voice, open at night.
+  Refreshed 2026-05-09: palette aligned to toybox standard, two-column layout,
+  axioms sidebar, search panel, galleries tab.
 */
 
 :root {
-  /* Paper, dimmed for night reading */
-  --paper:        #ece2cf;
-  --paper-deep:   #e0d4bd;
+  /* Paper */
+  --paper:        #f5efe0;
+  --paper-deep:   #ecddc8;
   --paper-edge:   #c8b896;
 
   /* Inks */
-  --ink:          #2a241c;            /* body text */
+  --ink:          #2d2418;            /* body text */
   --ink-soft:     #5a4d3c;            /* secondary */
   --ink-faded:    #8a7c66;            /* hints */
   --ink-indigo:   #2c3258;            /* accent — deep faded indigo */
   --ink-sepia:    #7a4a2a;            /* librarian's voice */
+  --ink-rule:     #2a2419;            /* hairline rules */
 
   /* Lamp glow + ambient */
-  --lamp-warm:    rgba(255, 200, 120, 0.18);
-  --lamp-edge:    rgba(20, 14, 6, 0.35);
+  --lamp-warm:    rgba(255, 200, 120, 0.13);
+  --lamp-edge:    rgba(20, 14, 6, 0.28);
 
   /* Type */
   --serif:        'EB Garamond', 'Garamond', 'Iowan Old Style', Georgia, serif;
@@ -68,8 +71,8 @@ body {
   flex-wrap: wrap;
   gap: 0.6rem 1.2rem;
   align-items: baseline;
-  padding: 1.4rem 2rem 1rem;
-  border-bottom: 1px solid var(--paper-edge);
+  padding: 1.2rem 2rem 0.9rem;
+  border-bottom: 2px solid var(--ink-rule);
 }
 
 .address-label {
@@ -102,6 +105,7 @@ body {
 #room-tabs {
   display: flex;
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .tab {
@@ -128,9 +132,82 @@ body {
 main {
   position: relative;
   z-index: 1;
-  max-width: 44rem;
+  max-width: 72rem;
   margin: 0 auto;
   padding: 2.5rem 2rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr 18rem;
+  grid-template-areas: "room sidebar";
+  gap: 3rem;
+}
+
+/* On narrow screens collapse to single column */
+@media (max-width: 860px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-areas: "room" "sidebar";
+    gap: 2rem;
+  }
+}
+
+#rooms-container {
+  grid-area: room;
+  min-width: 0;
+}
+
+#axioms-sidebar {
+  grid-area: sidebar;
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  padding-top: 0.2rem;
+}
+
+.axioms-heading {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faded);
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--paper-edge);
+}
+
+.axiom {
+  margin-bottom: 1.1rem;
+  padding-left: 1.1em;
+  border-left: 2px solid var(--paper-edge);
+}
+
+.axiom-num {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-faded);
+  margin-bottom: 0.15em;
+}
+
+.axioms-coda {
+  margin-top: 1.4rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--paper-edge);
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--ink-faded);
+}
+
+.axioms-coda a {
+  color: var(--ink-indigo);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms;
+}
+
+.axioms-coda a:hover {
+  border-bottom-color: var(--ink-indigo);
 }
 
 .room { display: none; }
@@ -276,10 +353,156 @@ body:not(.reading-room-active) #librarian {
   color: var(--ink-faded);
 }
 
+/* === Search panel === */
+
+#search-panel {
+  margin-bottom: 2rem;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-deep);
+}
+
+#search-panel h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+  color: var(--ink);
+}
+
+#search-panel p {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 0.8rem;
+}
+
+#search-form {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+#search-input {
+  flex: 1 1 18rem;
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+  padding: 0.4rem 0.6rem;
+  outline: none;
+}
+
+#search-input:focus {
+  border-color: var(--ink-indigo);
+}
+
+#search-btn {
+  background: transparent;
+  border: 1px solid var(--paper-edge);
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms;
+}
+
+#search-btn:hover {
+  border-color: var(--ink-indigo);
+  color: var(--ink-indigo);
+}
+
+#search-result {
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  min-height: 1.3em;
+}
+
+#search-result .found-coord {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--ink-indigo);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* === Galleries === */
+
+#galleries {
+  /* room container — full display: block when active */
+}
+
+.galleries-heading {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--paper-edge);
+  padding-bottom: 0.6rem;
+}
+
+.galleries-subhead {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  margin-bottom: 1.6rem;
+}
+
+.gallery-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gallery-item {
+  border: 1px solid var(--paper-edge);
+  padding: 1rem 1.2rem;
+  background: var(--paper-deep);
+  cursor: pointer;
+  transition: border-color 120ms;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gallery-item:hover {
+  border-color: var(--ink-indigo);
+}
+
+.gallery-item-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.gallery-item-excerpt {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.gallery-item-coord {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faded);
+  margin-top: 0.2rem;
+}
+
 /* === Corkboard === */
 
 #corkboard {
-  /* will style next pass */
+  /* room container */
 }
 
 .corkboard-title {
