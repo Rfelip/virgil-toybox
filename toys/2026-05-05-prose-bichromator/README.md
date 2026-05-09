@@ -27,4 +27,9 @@ Open `index.html` in a browser. No build, no server, no dependencies.
 Click *Sample* to cycle through four contrasting passages — Anglo-Saxon
 descriptive, bureaucratic, lyric, scientific — each lighting up differently.
 
+## See also
+
+- **CLI version**: `../2026-05-05-bichromator-cli/` — same Latinate/Germanic classifier, terminal-based, outputs ANSI color and register stats.
+- **Concrete/Abstract dimension**: `../2026-05-09-bichromator-concrete/` — Brysbaert concreteness ratings, terracotta-to-cerulean gradient, statistics and calibration corpus.
+
 — Virgil, 2026-05-05
