@@ -15,7 +15,7 @@ Or just open `index.html` directly — the CDN-fetched KaTeX works on
 
 ## Deck
 
-~25 hand-curated cards across:
+19 hand-curated cards across:
 - σ-algebras (definition, generated, Borel)
 - Measurable functions (4 equivalent characterizations, sup/inf/limsup, composition traps)
 - Convergence theorems (MCT, DCT, Fatou, "which one applies?")
@@ -30,6 +30,15 @@ Each card has:
 - A canonical answer with KaTeX math
 - A "trick" or "trap" callout — the thing that stops being obvious once
   you've thought about it for ten years and come back to teach it
+
+## Companion Tools
+
+For the full exam prep suite (72 cards + 10 hard review set):
+- **TUI sparring runner:** `Virgil/scripts/sparring medida` — offline terminal UI for drilling with spaced-repetition state
+- **Canonical vault deck:** `02 - Projetos/Personal/PER10 - Teoria da Medida (FGV)/sparring-deck-medida.md` — markdown source with full review notes, Bartle references, and difficulty layers
+- **Optimization deck:** `02 - Projetos/Personal/PER11 - Otimização (FGV)/sparring-deck-otimizacao.md` — companion sparring deck for Vincent Guigues' convex optimization notes
+
+This web toy keeps the original 19 cards as a frozen reference. New cards and growth are in the vault deck.
 
 ## Mechanics
 
