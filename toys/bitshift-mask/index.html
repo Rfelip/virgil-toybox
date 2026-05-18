@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bit-shifts and masks — a refresher for the 03 - Contratos exposure pipeline</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --bg-elev: #161b22;
+    --bg-elev-2: #1c232c;
+    --fg: #d6deeb;
+    --fg-dim: #8b9bb1;
+    --accent: #7ee7c7;
+    --accent-2: #ffcb6b;
+    --accent-3: #c792ea;
+    --on: #ffcb6b;
+    --off: #2a313c;
+    --on-fg: #1c1410;
+    --border: #232a34;
+    --code-bg: #0a0d12;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 48px 0 12px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+  h3 {
+    font-size: 17px;
+    margin: 24px 0 8px;
+    color: var(--accent-2);
+  }
+  p { margin: 10px 0; }
+  .subtitle { color: var(--fg-dim); margin-top: 0; }
+  code, pre, .mono {
+    font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent-2);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    color: var(--fg);
+    line-height: 1.5;
+  }
+  pre code { background: transparent; padding: 0; color: var(--fg); }
+
+  .widget {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 18px 0;
+  }
+  .widget h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .ctrl {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
+  }
+  .ctrl label {
+    font-size: 12px;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .ctrl input[type=range] {
+    accent-color: var(--accent);
+    width: 100%;
+  }
+  .ctrl .val {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .result {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  .result .line { display: flex; gap: 10px; padding: 2px 0; }
+  .result .key { color: var(--fg-dim); min-width: 110px; }
+  .result .v   { color: var(--accent-2); }
+
+  /* Bit row visualisation */
+  .bitrow {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .bit {
+    aspect-ratio: 1 / 1.4;
+    background: var(--off);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 13px;
+    color: var(--fg-dim);
+    border: 1px solid transparent;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .bit.on {
+    background: var(--on);
+    color: var(--on-fg);
+    font-weight: 600;
+  }
+  .bit .lbl {
+    font-size: 9px;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .bit .idx {
+    font-size: 11px;
+    opacity: 0.6;
+  }
+  .bit.on .idx, .bit.on .lbl { opacity: 0.85; }
+
+  .legend {
+    font-size: 12px;
+    color: var(--fg-dim);
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent-3);
+    background: rgba(199, 146, 234, 0.06);
+    padding: 8px 14px;
+    margin: 14px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .warn {
+    border-left: 3px solid var(--accent-2);
+    background: rgba(255, 203, 107, 0.06);
+    padding: 8px 14px;
+    margin: 14px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 13px;
+  }
+  table.compare th, table.compare td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+  }
+  table.compare th { background: var(--bg-elev-2); color: var(--fg-dim); font-weight: 500; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+  .toc {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 18px 0 28px;
+    font-size: 14px;
+  }
+  .toc ol { margin: 6px 0 0 18px; padding: 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bit-shifts and masks</h1>
+  <p class="subtitle">A refresher oriented around the 13-bit monthly exposure mask in <code>03 - Contratos</code>.</p>
+
+  <div class="toc">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#binary">Binary, smallints, and bit positions</a></li>
+      <li><a href="#shift">The <code>&lt;&lt;</code> operator</a></li>
+      <li><a href="#range-mask">The range-mask trick: <code>(1 &lt;&lt; n) - 1</code></a></li>
+      <li><a href="#spell">Building a bit range [a..b]: the spell formula</a></li>
+      <li><a href="#cascade">The death cascade: AND with a keep mask</a></li>
+      <li><a href="#nor">Why not NOR? (and AND-NOT equivalence)</a></li>
+      <li><a href="#bitor"><code>BIT_OR</code> aggregate over spells</a></li>
+    </ol>
+  </div>
+
+  <p>The pipeline encodes monthly exposure as a 13-bit mask stored in a <code>smallint</code>:</p>
+  <pre><code>bit  0     = carryover (active at year start)
+bit  1..12 = active during Jan, Feb, ..., Dec</code></pre>
+  <p>The two formulas in play are:</p>
+  <pre><code>spell_mask = (1 &lt;&lt; (LEAST(end_m, 12) + 1)) - (1 &lt;&lt; start_m)
+death_mask = mask &amp; ((1 &lt;&lt; (K + 1)) - 1)</code></pre>
+  <p>The rest of the page unpacks both, with interactive bit-row widgets. Throughout, bit 0 is rendered on the right, bit 12 on the left — the natural reading order for binary literals.</p>
+
+  <h2 id="binary">1. Binary, smallints, and bit positions</h2>
+  <p>A <code>smallint</code> is a 16-bit two's complement integer. We only use the low 13 bits. Each bit position <em>i</em> contributes <code>2<sup>i</sup></code> to the integer value when it is 1:</p>
+  <p style="text-align:center; font-family: 'JetBrains Mono', ui-monospace, monospace;">
+    value = &sum;<sub>i</sub> bit<sub>i</sub> &middot; 2<sup>i</sup>
+  </p>
+  <p>So bit 0 is the ones place, bit 1 the twos, bit 5 the 32s, bit 12 the 4096s. Setting bits 5..8 means the integer equals 2<sup>5</sup>+2<sup>6</sup>+2<sup>7</sup>+2<sup>8</sup> = 32+64+128+256 = 480.</p>
+
+  <div class="widget">
+    <h4>Anatomy of the 13-bit mask</h4>
+    <p style="margin-top:0; font-size:14px; color:var(--fg-dim);">A static reference layout. Bit 0 (carry) is on the right; bit 12 (Dec) is on the left.</p>
+    <div id="anatomy" class="bitrow"></div>
+    <div class="legend"><span>bit 12 &nbsp;(Dec)</span><span>(carry) &nbsp;bit 0</span></div>
+  </div>
+
+  <h2 id="shift">2. The <code>&lt;&lt;</code> operator</h2>
+  <p><code>x &lt;&lt; n</code> shifts the bits of <em>x</em> left by <em>n</em> positions, filling with zeros on the right. Arithmetically it is multiplication by 2<sup>n</sup>:</p>
+  <p style="text-align:center; font-family:'JetBrains Mono',ui-monospace,monospace;">x &lt;&lt; n &nbsp;=&nbsp; x &middot; 2<sup>n</sup></p>
+  <p>The idiom <code>1 &lt;&lt; n</code> therefore yields a one-hot mask with exactly bit <em>n</em> set:</p>
+  <pre><code>1 &lt;&lt; 0  = 1       (bit 0)
+1 &lt;&lt; 1  = 2       (bit 1)
+1 &lt;&lt; 5  = 32      (bit 5)
+1 &lt;&lt; 13 = 8192    (bit 13 — outside our 13-bit window)</code></pre>
+
+  <div class="widget">
+    <h4>Interactive: <code>1 &lt;&lt; n</code></h4>
+    <div class="controls">
+      <div class="ctrl">
+        <label>n = <span class="val" id="s2-n-v">5</span></label>
+        <input type="range" id="s2-n" min="0" max="12" value="5">
+      </div>
+    </div>
+    <div id="s2-bits" class="bitrow"></div>
+    <div class="result" id="s2-out"></div>
+  </div>
+
+  <h2 id="range-mask">3. The range-mask trick: <code>(1 &lt;&lt; n) - 1</code></h2>
+  <p>This is the workhorse. Subtracting one from a power of two flips all bits below it:</p>
+  <pre><code>1 &lt;&lt; 5      =  0b00000100000   (just bit 5)
+(1 &lt;&lt; 5) - 1 = 0b00000011111   (bits 0..4)</code></pre>
+  <p>So <code>(1 &lt;&lt; n) - 1</code> produces a mask with bits <strong>0..n-1</strong> set — equivalently, "the low <em>n</em> bits". This is the building block for both formulas in the pipeline.</p>
+
+  <div class="widget">
+    <h4>Interactive: <code>(1 &lt;&lt; n) - 1</code></h4>
+    <div class="controls">
+      <div class="ctrl">
+        <label>n = <span class="val" id="s3-n-v">5</span></label>
+        <input type="range" id="s3-n" min="0" max="13" value="5">
+      </div>
+    </div>
+    <div id="s3-bits" class="bitrow"></div>
+    <div class="result" id="s3-out"></div>
+  </div>
+
+  <h2 id="spell">4. Building a bit range [a..b] (inclusive): the spell formula</h2>
+  <p>Given a spell covering months <code>start_m</code> through <code>end_m</code> (both inclusive, both indices into our 13-bit layout), we want a mask with bits <em>a..b</em> set. The identity is:</p>
+  <pre><code>bits a..b  =  (bits 0..b)  -  (bits 0..a-1)
+           =  ((1 &lt;&lt; (b+1)) - 1)  -  ((1 &lt;&lt; a) - 1)
+           =  (1 &lt;&lt; (b+1))  -  (1 &lt;&lt; a)</code></pre>
+  <p>The two <code>-1</code> terms cancel, leaving the clean form used in SQL:</p>
+  <pre><code>spell_mask = (1 &lt;&lt; (LEAST(end_m, 12) + 1)) - (1 &lt;&lt; start_m)</code></pre>
+  <p>Why it works arithmetically: <code>(1 &lt;&lt; (b+1))</code> is "the bit just above b". Subtracting <code>(1 &lt;&lt; a)</code> from it borrows down through every position from <em>a</em> to <em>b</em>, turning all of them into 1s — the same way <code>1000 - 1 = 999</code> in decimal cascades a borrow through three digits.</p>
+
+  <p>Worked example: <code>start_m=5, end_m=8</code>:</p>
+  <pre><code>(1 &lt;&lt; 9) - (1 &lt;&lt; 5)
+= 512 - 32
+= 480
+= 0b0000111100000   (bits 5, 6, 7, 8)</code></pre>
+
+  <div class="widget">
+    <h4>Interactive: the spell formula</h4>
+    <div class="controls">
+      <div class="ctrl">
+        <label>start_m = <span class="val" id="s4-a-v">5</span></label>
+        <input type="range" id="s4-a" min="0" max="12" value="5">
+      </div>
+      <div class="ctrl">
+        <label>end_m = <span class="val" id="s4-b-v">8</span></label>
+        <input type="range" id="s4-b" min="0" max="12" value="8">
+      </div>
+    </div>
+    <div id="s4-bits" class="bitrow"></div>
+    <div class="result" id="s4-out"></div>
+  </div>
+  <div class="note">If <code>start_m &gt; end_m</code> the formula returns a negative integer — the SQL pipeline guarantees <code>start_m &le; end_m</code> upstream when spells are constructed.</div>
+
+  <h2 id="cascade">5. The death cascade: AND with a keep mask</h2>
+  <p>When a death event lands in month <em>K</em>, the person's exposure cannot extend past <em>K</em>. We need to zero out every bit strictly greater than <em>K</em>, keeping bits 0..K untouched.</p>
+  <p>The keep mask is exactly the range-mask trick again:</p>
+  <pre><code>keep = (1 &lt;&lt; (K + 1)) - 1     -- bits 0..K set</code></pre>
+  <p>AND with this mask:</p>
+  <pre><code>death_mask = mask &amp; ((1 &lt;&lt; (K + 1)) - 1)</code></pre>
+  <p>Recall the truth table for AND: a bit survives only if it is 1 in <em>both</em> operands. So bits 0..K survive (where keep is 1), and bits K+1..12 are forced to 0 (where keep is 0). The original bit pattern in positions 0..K is preserved exactly.</p>
+
+  <p>Worked example: <code>mask = 0b1111111111111</code> (all 13 bits), <code>K = 5</code>:</p>
+  <pre><code>keep = (1 &lt;&lt; 6) - 1 = 63 = 0b0000000111111
+mask &amp; keep         = 63 = 0b0000000111111</code></pre>
+
+  <div class="widget">
+    <h4>Interactive: death cascade</h4>
+    <div class="controls">
+      <div class="ctrl">
+        <label>input mask (toggle bits)</label>
+        <div style="font-size:11px; color:var(--fg-dim); margin-top:2px;">click any bit below</div>
+      </div>
+      <div class="ctrl">
+        <label>K (death month) = <span class="val" id="s5-k-v">5</span></label>
+        <input type="range" id="s5-k" min="0" max="12" value="5">
+      </div>
+    </div>
+    <h4 style="margin-top:10px;">mask</h4>
+    <div id="s5-mask" class="bitrow"></div>
+    <h4 style="margin-top:14px;">keep = (1 &lt;&lt; (K+1)) - 1</h4>
+    <div id="s5-keep" class="bitrow"></div>
+    <h4 style="margin-top:14px;">mask &amp; keep</h4>
+    <div id="s5-result" class="bitrow"></div>
+    <div class="result" id="s5-out"></div>
+  </div>
+
+  <h2 id="nor">6. Why not NOR? (and AND-NOT equivalence)</h2>
+  <p>NOR is a specific gate: <code>NOR(a, b) = ~(a | b)</code>. It returns 1 only where both inputs are 0. That's not what we want here. The pattern "keep some bits, clear others" is <strong>AND-NOT</strong> at the gate level, sometimes written <code>BIC</code> (bit clear) or <code>ANDN</code>:</p>
+  <pre><code>mask &amp; ~void   -- keep bits not in void</code></pre>
+  <p>Where <code>void</code> would be the bits-to-clear (here: bits K+1..12). That is mathematically equivalent to ANDing with the complement, but it costs one extra negation. Going directly to a keep mask is cleaner:</p>
+
+  <table class="compare">
+    <thead><tr><th>Approach</th><th>Expression</th><th>Ops</th></tr></thead>
+    <tbody>
+      <tr><td>AND with keep</td><td><code>mask &amp; ((1 &lt;&lt; (K+1)) - 1)</code></td><td>1 shift, 1 sub, 1 and</td></tr>
+      <tr><td>AND-NOT void</td><td><code>mask &amp; ~(~0 &lt;&lt; (K+1))</code></td><td>1 shift, 1 not, 1 and (plus width considerations)</td></tr>
+      <tr><td>NOR (wrong)</td><td><code>~(mask | void)</code></td><td>different function — collapses 'keep' bits too</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">In SQL with a signed <code>smallint</code> the AND-NOT form has to be careful about the width and sign of <code>~0</code>. The keep-mask form sidesteps that entirely — it never produces a number outside the 13-bit range.</div>
+
+  <h2 id="bitor">7. <code>BIT_OR</code> aggregate over spells</h2>
+  <p>Per row we have a <code>spell_mask</code>. Per <code>(cpf, cobertura, emp, cod_emp, produto, ref_info)</code> group we want a single mask whose bit <em>i</em> is set iff <em>any</em> spell covered month <em>i</em>. That's the OR aggregate:</p>
+  <pre><code>SELECT cpf, ..., BIT_OR(spell_mask) AS exposure_mask
+FROM spells
+GROUP BY cpf, ...</code></pre>
+  <p>OR's truth table: a bit is 1 in the output iff it is 1 in any input. Aggregating it row-wise is the natural lift to a set of rows. If spells don't overlap, <code>BIT_OR</code> behaves like a disjoint union. If they do overlap, the overlap collapses idempotently — exactly what we want for "was this person exposed in month <em>i</em>?".</p>
+
+  <div class="widget">
+    <h4>Interactive: combining three spells with <code>BIT_OR</code></h4>
+    <div class="controls">
+      <div class="ctrl">
+        <label>spell A: <span class="val" id="s7-a">[1..3]</span></label>
+        <input type="range" id="s7-a1" min="0" max="12" value="1">
+        <input type="range" id="s7-a2" min="0" max="12" value="3">
+      </div>
+      <div class="ctrl">
+        <label>spell B: <span class="val" id="s7-b">[5..7]</span></label>
+        <input type="range" id="s7-b1" min="0" max="12" value="5">
+        <input type="range" id="s7-b2" min="0" max="12" value="7">
+      </div>
+      <div class="ctrl">
+        <label>spell C: <span class="val" id="s7-c">[6..10]</span></label>
+        <input type="range" id="s7-c1" min="0" max="12" value="6">
+        <input type="range" id="s7-c2" min="0" max="12" value="10">
+      </div>
+    </div>
+    <h4 style="margin-top:10px;">spell A</h4>
+    <div id="s7-rowA" class="bitrow"></div>
+    <h4 style="margin-top:10px;">spell B</h4>
+    <div id="s7-rowB" class="bitrow"></div>
+    <h4 style="margin-top:10px;">spell C</h4>
+    <div id="s7-rowC" class="bitrow"></div>
+    <h4 style="margin-top:10px;">BIT_OR(A, B, C)</h4>
+    <div id="s7-rowOR" class="bitrow"></div>
+    <div class="result" id="s7-out"></div>
+  </div>
+
+  <hr>
+  <p style="color:var(--fg-dim); font-size:13px;">
+    Reference. The full encoding lives in <code>03_contratos.md</code>; this page is a self-contained reminder of the bit-twiddling primitives it uses. Open in any browser; no build step.
+  </p>
+</main>
+
+<script>
+"use strict";
+
+const MONTH_LABELS = ["carry","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+// Render a 13-bit row into `container`. Bit 0 on the right, bit 12 on the left.
+function renderBits(container, value, opts) {
+  opts = opts || {};
+  container.innerHTML = "";
+  // Build bits 12..0 left to right
+  for (let i = 12; i >= 0; i--) {
+    const cell = document.createElement("div");
+    cell.className = "bit";
+    const on = (value >> i) & 1;
+    if (on) cell.classList.add("on");
+
+    const idx = document.createElement("div");
+    idx.className = "idx";
+    idx.textContent = i;
+    const lbl = document.createElement("div");
+    lbl.className = "lbl";
+    lbl.textContent = MONTH_LABELS[i];
+
+    cell.appendChild(idx);
+    cell.appendChild(lbl);
+
+    if (opts.clickable) {
+      cell.style.cursor = "pointer";
+      cell.dataset.bit = i;
+      cell.addEventListener("click", opts.onClick);
+    }
+    container.appendChild(cell);
+  }
+}
+
+function bin13(n) {
+  // Force into 13-bit unsigned representation
+  const masked = n & 0x1fff;
+  return masked.toString(2).padStart(13, "0");
+}
+
+function fmtBinary(n) {
+  const s = bin13(n);
+  // group as 1 | 12 (carry | months)
+  return s[0] + s.slice(1, 4) + " " + s.slice(4, 7) + " " + s.slice(7, 10) + " " + s.slice(10, 13);
+}
+
+// ---------- Anatomy ----------
+renderBits(document.getElementById("anatomy"), 0);
+
+// ---------- Section 2: 1 << n ----------
+(function() {
+  const slider = document.getElementById("s2-n");
+  const lbl = document.getElementById("s2-n-v");
+  const row = document.getElementById("s2-bits");
+  const out = document.getElementById("s2-out");
+  function update() {
+    const n = +slider.value;
+    const v = 1 << n;
+    lbl.textContent = n;
+    renderBits(row, v);
+    out.innerHTML =
+      `<div class="line"><span class="key">expr</span><span class="v">1 &lt;&lt; ${n}</span></div>` +
+      `<div class="line"><span class="key">decimal</span><span class="v">${v}</span></div>` +
+      `<div class="line"><span class="key">binary</span><span class="v">${fmtBinary(v)}</span></div>` +
+      `<div class="line"><span class="key">2^n</span><span class="v">${Math.pow(2,n)}</span></div>`;
+  }
+  slider.addEventListener("input", update);
+  update();
+})();
+
+// ---------- Section 3: (1 << n) - 1 ----------
+(function() {
+  const slider = document.getElementById("s3-n");
+  const lbl = document.getElementById("s3-n-v");
+  const row = document.getElementById("s3-bits");
+  const out = document.getElementById("s3-out");
+  function update() {
+    const n = +slider.value;
+    const v = (1 << n) - 1;
+    lbl.textContent = n;
+    renderBits(row, v);
+    out.innerHTML =
+      `<div class="line"><span class="key">expr</span><span class="v">(1 &lt;&lt; ${n}) - 1</span></div>` +
+      `<div class="line"><span class="key">decimal</span><span class="v">${v}</span></div>` +
+      `<div class="line"><span class="key">binary</span><span class="v">${fmtBinary(v)}</span></div>` +
+      `<div class="line"><span class="key">bits set</span><span class="v">${n === 0 ? "(none)" : "0.." + (n-1)}</span></div>`;
+  }
+  slider.addEventListener("input", update);
+  update();
+})();
+
+// ---------- Section 4: spell formula ----------
+(function() {
+  const a = document.getElementById("s4-a");
+  const b = document.getElementById("s4-b");
+  const av = document.getElementById("s4-a-v");
+  const bv = document.getElementById("s4-b-v");
+  const row = document.getElementById("s4-bits");
+  const out = document.getElementById("s4-out");
+  function update() {
+    const start = +a.value;
+    const end = +b.value;
+    av.textContent = start;
+    bv.textContent = end;
+    const v = (1 << (Math.min(end, 12) + 1)) - (1 << start);
+    renderBits(row, v);
+    const valid = start <= end;
+    out.innerHTML =
+      `<div class="line"><span class="key">expr</span><span class="v">(1 &lt;&lt; ${end+1}) - (1 &lt;&lt; ${start})</span></div>` +
+      `<div class="line"><span class="key">decimal</span><span class="v">${v}${valid ? "" : "  (invalid: start &gt; end)"}</span></div>` +
+      `<div class="line"><span class="key">binary</span><span class="v">${fmtBinary(v)}</span></div>` +
+      `<div class="line"><span class="key">bits set</span><span class="v">${valid ? start + ".." + end : "—"}</span></div>`;
+  }
+  a.addEventListener("input", update);
+  b.addEventListener("input", update);
+  update();
+})();
+
+// ---------- Section 5: death cascade ----------
+(function() {
+  const k = document.getElementById("s5-k");
+  const kv = document.getElementById("s5-k-v");
+  const maskRow = document.getElementById("s5-mask");
+  const keepRow = document.getElementById("s5-keep");
+  const resRow = document.getElementById("s5-result");
+  const out = document.getElementById("s5-out");
+  let mask = 0x1fff; // start fully on
+
+  function update() {
+    const K = +k.value;
+    kv.textContent = K;
+    const keep = (1 << (K + 1)) - 1;
+    const result = mask & keep;
+    renderBits(maskRow, mask, {clickable: true, onClick: onBitClick});
+    renderBits(keepRow, keep);
+    renderBits(resRow, result);
+    out.innerHTML =
+      `<div class="line"><span class="key">mask</span><span class="v">${fmtBinary(mask)} = ${mask}</span></div>` +
+      `<div class="line"><span class="key">keep</span><span class="v">${fmtBinary(keep)} = ${keep}</span></div>` +
+      `<div class="line"><span class="key">mask &amp; keep</span><span class="v">${fmtBinary(result)} = ${result}</span></div>`;
+  }
+  function onBitClick(e) {
+    const cell = e.currentTarget;
+    const i = +cell.dataset.bit;
+    mask ^= (1 << i);
+    update();
+  }
+  k.addEventListener("input", update);
+  update();
+})();
+
+// ---------- Section 7: BIT_OR over spells ----------
+(function() {
+  const ids = ["a","b","c"];
+  const rowMap = {a:"s7-rowA", b:"s7-rowB", c:"s7-rowC"};
+  const lblMap = {a:"s7-a", b:"s7-b", c:"s7-c"};
+  const orRow = document.getElementById("s7-rowOR");
+  const out = document.getElementById("s7-out");
+
+  function spell(start, end) {
+    if (start > end) return 0;
+    return (1 << (Math.min(end, 12) + 1)) - (1 << start);
+  }
+  function update() {
+    let orv = 0;
+    const vals = {};
+    ids.forEach(id => {
+      const s = +document.getElementById("s7-" + id + "1").value;
+      const e = +document.getElementById("s7-" + id + "2").value;
+      const v = spell(s, e);
+      vals[id] = {s, e, v};
+      orv |= v;
+      renderBits(document.getElementById(rowMap[id]), v);
+      document.getElementById(lblMap[id]).textContent = "[" + s + ".." + e + "]";
+    });
+    renderBits(orRow, orv);
+    out.innerHTML =
+      `<div class="line"><span class="key">A</span><span class="v">${fmtBinary(vals.a.v)} = ${vals.a.v}</span></div>` +
+      `<div class="line"><span class="key">B</span><span class="v">${fmtBinary(vals.b.v)} = ${vals.b.v}</span></div>` +
+      `<div class="line"><span class="key">C</span><span class="v">${fmtBinary(vals.c.v)} = ${vals.c.v}</span></div>` +
+      `<div class="line"><span class="key">BIT_OR</span><span class="v">${fmtBinary(orv)} = ${orv}</span></div>`;
+  }
+  ids.forEach(id => {
+    document.getElementById("s7-" + id + "1").addEventListener("input", update);
+    document.getElementById("s7-" + id + "2").addEventListener("input", update);
+  });
+  update();
+})();
+</script>
+</body>
+</html>
